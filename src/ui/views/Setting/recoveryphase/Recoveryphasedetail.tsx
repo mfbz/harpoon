@@ -75,7 +75,7 @@ const RecoveryPhasesDetail = () => {
                   marginBottom: '10px',
                 }}
               >
-                {/* <Chip label={i+1} sx={{ color: '#41CC5D',backgroundColor: '#282828',marginRight: '10px',
+                {/* <Chip label={i+1} sx={{ color: '#009DD5',backgroundColor: '#282828',marginRight: '10px',
                                     fontSize: '12px', fontWeight: 'Semibold', borderRadius: '100%',height: '24px',width: '24px',justifyContent: 'center'}} /> */}
                 <Box
                   sx={{
@@ -86,14 +86,14 @@ const RecoveryPhasesDetail = () => {
                     width: '24px',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    fontColor: '#41CC5D',
+                    fontColor: '#009DD5',
                   }}
                 >
                   <Typography
                     sx={{
                       fontSize: '12px',
                       fontWeight: '600',
-                      color: '#41CC5D',
+                      color: '#009DD5',
                       textAlign: 'center',
                       marginTop: '4px',
                     }}

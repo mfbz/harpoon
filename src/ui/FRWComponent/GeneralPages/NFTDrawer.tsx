@@ -80,7 +80,7 @@ export const NFTMoveDrawer: React.FC<NFTMoveDrawerProps> = ({
             sx={{
               fontSize: '20px',
               textAlign: 'center',
-              fontFamily: 'e-Ukraine',
+              fontFamily: 'Space-Grotesk',
               lineHeight: '24px',
               fontWeight: '700',
             }}
@@ -195,7 +195,7 @@ export const NFTMoveDrawer: React.FC<NFTMoveDrawerProps> = ({
                   height: '84px',
                   borderRadius: '16px',
                   marginBottom: '3px',
-                  border: nftIdArray.includes(nft.id) && '1px solid #41CC5D',
+                  border: nftIdArray.includes(nft.id) && '1px solid #009DD5',
                 }}
               >
                 <Button

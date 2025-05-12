@@ -34,7 +34,7 @@ const themeOptions: ThemeOptions = {
       title: '#E6E6E6',
       error: '#E54040',
       good: '#FF8A00',
-      increase: '#41CC5D',
+      increase: '#009DD5',
       decrease: '#E54040',
     },
     testnet: {
@@ -46,8 +46,8 @@ const themeOptions: ThemeOptions = {
       light: '#CCAF2129',
     },
     success: {
-      main: '#41CC5D',
-      light: '#41CC5D29',
+      main: '#009DD5',
+      light: '#009DD529',
       contrastText: '#000000CC',
     },
     error: {
@@ -60,7 +60,7 @@ const themeOptions: ThemeOptions = {
     },
     primary: {
       // light: will be calculated from palette.primary.main,
-      main: '#41CC5D',
+      main: '#009DD5',
       light: '#FFFFFF',
       // dark: will be calculated from palette.primary.main,
       // contrastText: will be calculated to contrast with palette.primary.main
@@ -118,27 +118,27 @@ const themeOptions: ThemeOptions = {
     },
     fontFamily: ['Inter', 'sans-serif'].join(','),
     h1: {
-      fontFamily: 'e-Ukraine,sans-serif',
+      fontFamily: 'Space-Grotesk,sans-serif',
       fontWeight: 'Bold',
     },
     h2: {
-      fontFamily: 'e-Ukraine,sans-serif',
+      fontFamily: 'Space-Grotesk,sans-serif',
       fontWeight: 'Bold',
     },
     h3: {
-      fontFamily: 'e-Ukraine,sans-serif',
+      fontFamily: 'Space-Grotesk,sans-serif',
       fontWeight: 'Bold',
     },
     h4: {
-      fontFamily: 'e-Ukraine,sans-serif',
+      fontFamily: 'Space-Grotesk,sans-serif',
       fontWeight: 'Bold',
     },
     h5: {
-      fontFamily: 'e-Ukraine,sans-serif',
+      fontFamily: 'Space-Grotesk,sans-serif',
       fontWeight: 'Bold',
     },
     h6: {
-      fontFamily: 'e-Ukraine,sans-serif',
+      fontFamily: 'Space-Grotesk,sans-serif',
       fontWeight: 'Bold',
     },
     body1: {

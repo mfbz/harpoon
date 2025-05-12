@@ -20,7 +20,7 @@ const LLComingSoon = (props: ComingSoonProps) => {
       <Alert
         variant="filled"
         severity="info"
-        sx={{ backgroundColor: '#41CC5D' }}
+        sx={{ backgroundColor: '#009DD5' }}
         action={
           <IconButton aria-label="close" color="inherit" size="small" onClick={onCloseBtnClicked}>
             <CloseIcon fontSize="inherit" />

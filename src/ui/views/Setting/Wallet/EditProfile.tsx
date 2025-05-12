@@ -175,7 +175,7 @@ const EditProfile = (props: MoveBoardProps) => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       backgroundColor: emoji['bgcolor'],
-                      border: selectedEmoji === emoji ? '2px solid #41CC5D' : 'none',
+                      border: selectedEmoji === emoji ? '2px solid #009DD5' : 'none',
                     }}
                   >
                     <Typography sx={{ fontSize: '20px', fontWeight: '600' }}>

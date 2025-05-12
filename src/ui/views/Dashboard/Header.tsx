@@ -206,13 +206,13 @@ const Header = ({ _loading = false }) => {
   const networkColor = (network: string) => {
     switch (network) {
       case 'mainnet':
-        return '#41CC5D';
+        return '#009DD5';
       case 'testnet':
         return '#FF8A00';
       case 'crescendo':
         return '#CCAF21';
     }
-    return '#41CC5D';
+    return '#009DD5';
   };
 
   const checkAuthStatus = useCallback(async () => {

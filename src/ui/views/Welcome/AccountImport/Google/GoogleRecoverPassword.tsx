@@ -69,12 +69,12 @@ const BpIcon = styled('span')(() => ({
   borderRadius: 8,
   width: 24,
   height: 24,
-  border: '1px solid #41CC5D',
+  border: '1px solid #009DD5',
   backgroundColor: 'transparent',
 }));
 
 const BpCheckedIcon = styled(BpIcon)({
-  backgroundColor: '#41CC5D',
+  backgroundColor: '#009DD5',
   backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))',
   '&:before': {
     display: 'block',
@@ -87,7 +87,7 @@ const BpCheckedIcon = styled(BpIcon)({
     content: '""',
   },
   'input:hover ~ &': {
-    backgroundColor: '#41CC5D',
+    backgroundColor: '#009DD5',
   },
 });
 
@@ -164,7 +164,7 @@ const GoogleRecoverPassword = ({ handleSwitchTab, mnemonic, username, lastPasswo
           alignItems: 'center',
         }}
       >
-        <CheckCircleIcon size={24} color={'#41CC5D'} style={{ margin: '8px' }} />
+        <CheckCircleIcon size={24} color={'#009DD5'} style={{ margin: '8px' }} />
         <Typography variant="body1" color="success.main">
           {message}
         </Typography>

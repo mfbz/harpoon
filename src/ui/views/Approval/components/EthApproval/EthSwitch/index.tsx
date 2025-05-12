@@ -86,7 +86,7 @@ const EthSwitch = ({ params: { origin, target } }: ConnectProps) => {
   const networkColor = (network: string) => {
     switch (network) {
       case 'mainnet':
-        return '#41CC5D';
+        return '#009DD5';
       case 'testnet':
         return '#FF8A00';
       case 'crescendo':

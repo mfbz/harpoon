@@ -13,12 +13,12 @@ export const BpUncheked = styled(BpIcon)({
   width: 21,
   height: 21,
   display: 'block',
-  border: '1px solid #41CC5D',
+  border: '1px solid #009DD5',
   opacity: 1,
 });
 
 export const BpCheckedIcon = styled(BpIcon)({
-  backgroundColor: '#41CC5D',
+  backgroundColor: '#009DD5',
   backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))',
   '&:before': {
     display: 'block',
@@ -31,6 +31,6 @@ export const BpCheckedIcon = styled(BpIcon)({
     content: '""',
   },
   'input:hover ~ &': {
-    backgroundColor: '#41CC5D',
+    backgroundColor: '#009DD5',
   },
 });

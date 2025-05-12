@@ -91,7 +91,7 @@ const qrCode = new QRCodeStyling({
   },
   cornersDotOptions: {
     type: 'dot',
-    color: '#41CC5D',
+    color: '#009DD5',
   },
   backgroundOptions: {
     color: '#333333',

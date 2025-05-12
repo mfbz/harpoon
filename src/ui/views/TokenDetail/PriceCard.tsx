@@ -382,7 +382,7 @@ const PriceCard = ({ token, price, setPrice, providers }) => {
           {/* <CartesianGrid  /> */}
           <defs>
             <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#41CC5D" stopOpacity={0.5} />
+              <stop offset="5%" stopColor="#009DD5" stopOpacity={0.5} />
               <stop offset="95%" stopColor="#121212" stopOpacity={0.1} />
             </linearGradient>
           </defs>
@@ -404,7 +404,7 @@ const PriceCard = ({ token, price, setPrice, providers }) => {
           <Area
             type="monotone"
             dataKey="price"
-            stroke="#41CC5D"
+            stroke="#009DD5"
             fillOpacity={1}
             fill="url(#colorUv)"
           />

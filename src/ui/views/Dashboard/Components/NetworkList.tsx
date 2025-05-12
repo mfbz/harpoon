@@ -16,7 +16,7 @@ import networkLink from '../../../FRWAssets/svg/networkLink.svg';
 const bgColor = (network: string) => {
   switch (network) {
     case 'mainnet':
-      return '#41CC5D14';
+      return '#009DD514';
     case 'testnet':
       return '#FF8A0014';
     case 'crescendo':

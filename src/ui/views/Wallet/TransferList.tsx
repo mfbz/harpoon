@@ -150,7 +150,7 @@ const TransferList = () => {
                   fontSize: 10,
                   fontWeight: '500',
                   textAlign: 'start',
-                  color: '#41CC5D',
+                  color: '#009DD5',
                 }}
               >
                 {props.txType === 1 && props.receiver && ` To ${formatString(props.receiver)}`}

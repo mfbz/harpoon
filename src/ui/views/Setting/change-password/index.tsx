@@ -136,7 +136,7 @@ const ChangePassword = () => {
           alignItems: 'center',
         }}
       >
-        <CheckCircleIcon size={12} color={'#41CC5D'} style={{ margin: '8px' }} />
+        <CheckCircleIcon size={12} color={'#009DD5'} style={{ margin: '8px' }} />
         <Typography
           sx={{
             fontSize: '10px',
@@ -388,7 +388,7 @@ const ChangePassword = () => {
                       <LinearProgress sx={{ width: 14, height: 14 }} />
                     </Box>
                   ) : isSame ? (
-                    <CheckCircleIcon size={14} color={'#41CC5D'} style={{ margin: '8px' }} />
+                    <CheckCircleIcon size={14} color={'#009DD5'} style={{ margin: '8px' }} />
                   ) : (
                     <CancelIcon size={14} color={'#E54040'} style={{ margin: '8px' }} />
                   )}

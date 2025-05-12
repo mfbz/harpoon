@@ -174,7 +174,7 @@ const ManageBackups = () => {
             <LLSpinner size={20} />
           ) : hasBackup ? (
             <IconButton>
-              <CheckCircleIcon size={20} color={'#41CC5D'} />
+              <CheckCircleIcon size={20} color={'#009DD5'} />
             </IconButton>
           ) : (
             <Button variant="text" onClick={() => syncBackup()}>

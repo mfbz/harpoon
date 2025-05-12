@@ -77,7 +77,7 @@ export const LLConnectLoading = ({ logo }) => {
                     width: '10px',
                     height: '10px',
                     borderRadius: '10px',
-                    backgroundColor: '#41CC5D',
+                    backgroundColor: '#009DD5',
                   }}
                 />
               ) : (

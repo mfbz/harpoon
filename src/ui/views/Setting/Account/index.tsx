@@ -16,7 +16,7 @@ import { useWallet } from 'ui/utils';
 
 import EditAccount from './EditAccount';
 const orange = {
-  500: '#41CC5D',
+  500: '#009DD5',
 };
 
 const grey = {

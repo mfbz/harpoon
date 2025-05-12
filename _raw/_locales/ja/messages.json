@@ -1,6 +1,6 @@
 {
   "appName": {
-    "message": "Flow Wallet",
+    "message": "Harpoon Wallet",
     "description": "Application Name"
   },
   "appDescription": {
@@ -8,7 +8,7 @@
     "description": "Application Descrtipion"
   },
   "appNameBeta": {
-    "message": "Flow Wallet BETA",
+    "message": "Harpoon Wallet BETA",
     "description": "Application Name"
   },
   "appDescriptionBeta": {

@@ -5,7 +5,7 @@
 <rect x="2" y="2" width="18" height="18" rx="9" fill="url(#paint0_linear_15017_229)"/>
 <path d="M11 17.6621C14.6794 17.6621 17.6621 14.6794 17.6621 11C17.6621 7.32062 14.6794 4.33789 11 4.33789C7.32062 4.33789 4.33789 7.32062 4.33789 11C4.33789 14.6794 7.32062 17.6621 11 17.6621Z" fill="white"/>
 <path d="M13.9076 9.95038H12.0502V11.8481H13.9076V9.95038Z" fill="black"/>
-<path d="M10.1523 11.8481H12.0501V9.95038H10.1523V11.8481Z" fill="#41CC5D"/>
+<path d="M10.1523 11.8481H12.0501V9.95038H10.1523V11.8481Z" fill="#009DD5"/>
 </g>
 <rect x="1" y="1" width="20" height="20" rx="10" stroke="#121212" stroke-width="2"/>
 <defs>
@@ -17,7 +17,7 @@
 </pattern>
 <linearGradient id="paint0_linear_15017_229" x1="2" y1="2" x2="20" y2="20" gradientUnits="userSpaceOnUse">
 <stop stop-color="#1CEB8A"/>
-<stop offset="1" stop-color="#41CC5D"/>
+<stop offset="1" stop-color="#009DD5"/>
 </linearGradient>
 <clipPath id="clip0_15017_229">
 <rect x="2" y="2" width="18" height="18" rx="9" fill="white"/>

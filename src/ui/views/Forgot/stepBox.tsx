@@ -27,7 +27,7 @@ const stepBox = () => {
           height: '152px',
         }}
       >
-        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#41CC5D' }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#009DD5' }}>
           {chrome.i18n.getMessage('Step_1')}
         </Typography>
         <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#FFFFFFCC' }}>
@@ -46,7 +46,7 @@ const stepBox = () => {
           minWidth: '152px',
         }}
       >
-        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#41CC5D' }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#009DD5' }}>
           {chrome.i18n.getMessage('Step_2')}
         </Typography>
         <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#FFFFFFCC' }}>
@@ -65,7 +65,7 @@ const stepBox = () => {
           height: '152px',
         }}
       >
-        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#41CC5D' }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#009DD5' }}>
           {chrome.i18n.getMessage('Step_3')}
         </Typography>
         <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#FFFFFFCC' }}>

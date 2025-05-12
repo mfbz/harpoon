@@ -210,7 +210,7 @@ const SignMessage = ({ params: { icon, origin, tabId, type } }: ConnectProps) =>
               }}
             >
               <AccordionSummary
-                expandIcon={<ExpandMoreIcon sx={{ color: '#41CC5D', fontSize: 20 }} />}
+                expandIcon={<ExpandMoreIcon sx={{ color: '#009DD5', fontSize: 20 }} />}
                 aria-controls="panel1a-content"
                 sx={{ height: '40px !important' }}
               >

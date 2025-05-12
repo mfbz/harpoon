@@ -118,7 +118,7 @@ const MoveBoard = (props: MoveBoardProps) => {
             color="text"
             sx={{
               fontSize: '20px',
-              fontFamily: 'e-Ukraine',
+              fontFamily: 'Space-Grotesk',
               textAlign: 'center',
               lineHeight: '24px',
               fontWeight: '700',

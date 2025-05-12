@@ -57,9 +57,9 @@ const SendNFTConfirmation = (props: SendNFTConfirmationProps) => {
     '#32E35540',
     '#32E35559',
     '#32E35573',
-    '#41CC5D',
-    '#41CC5D',
-    '#41CC5D',
+    '#009DD5',
+    '#009DD5',
+    '#009DD5',
   ];
   const [erc721Contract, setErcContract] = useState<any>(null);
 

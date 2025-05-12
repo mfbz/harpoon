@@ -226,12 +226,12 @@ const AddList = () => {
                   gap: '10px',
                   flexShrink: 0,
                   borderRadius: '36px',
-                  border: `1.5px solid ${filter === 'all' ? '#41CC5D' : '#FFFFFF66'}`,
+                  border: `1.5px solid ${filter === 'all' ? '#009DD5' : '#FFFFFF66'}`,
                   backgroundColor: 'transparent',
-                  color: filter === 'all' ? '#41CC5D' : '#FFFFFF66',
+                  color: filter === 'all' ? '#009DD5' : '#FFFFFF66',
                   '&:hover': {
                     backgroundColor: 'transparent',
-                    color: '#41CC5D',
+                    color: '#009DD5',
                   },
                 }}
               >
@@ -248,12 +248,12 @@ const AddList = () => {
                   gap: '10px',
                   flexShrink: 0,
                   borderRadius: '36px',
-                  border: `1.5px solid ${filter === 'enabled' ? '#41CC5D' : '#FFFFFF66'}`,
+                  border: `1.5px solid ${filter === 'enabled' ? '#009DD5' : '#FFFFFF66'}`,
                   backgroundColor: 'transparent',
-                  color: filter === 'enabled' ? '#41CC5D' : '#FFFFFF66',
+                  color: filter === 'enabled' ? '#009DD5' : '#FFFFFF66',
                   '&:hover': {
                     backgroundColor: 'transparent',
-                    color: '#41CC5D',
+                    color: '#009DD5',
                   },
                 }}
               >
@@ -270,12 +270,12 @@ const AddList = () => {
                   gap: '10px',
                   flexShrink: 0,
                   borderRadius: '36px',
-                  border: `1.5px solid ${filter === 'notEnabled' ? '#41CC5D' : '#FFFFFF66'}`,
+                  border: `1.5px solid ${filter === 'notEnabled' ? '#009DD5' : '#FFFFFF66'}`,
                   backgroundColor: 'transparent',
-                  color: filter === 'notEnabled' ? '#41CC5D' : '#FFFFFF66',
+                  color: filter === 'notEnabled' ? '#009DD5' : '#FFFFFF66',
                   '&:hover': {
                     backgroundColor: 'transparent',
-                    color: '#41CC5D',
+                    color: '#009DD5',
                   },
                 }}
               >

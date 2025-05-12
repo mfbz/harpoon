@@ -87,7 +87,7 @@ const RemoveProfileModal: React.FC<RemoveProfileModalProps> = ({
       )}
 
       {!isCheckingBackup && hasBackup && (
-        <Box sx={{ display: 'flex', alignItems: 'center', color: '#41CC5D', mt: 1, mb: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', color: '#009DD5', mt: 1, mb: 1 }}>
           <CheckCircleOutlineIcon fontSize="small" sx={{ mr: 1 }} />
           <Typography sx={{ fontSize: '14px' }}>
             {chrome.i18n.getMessage('Backup__Found')}

@@ -78,7 +78,7 @@ const MoveCollectionSelect = ({
             sx={{
               fontSize: '20px',
               textAlign: 'center',
-              fontFamily: 'e-Ukraine',
+              fontFamily: 'Space-Grotesk',
               lineHeight: '24px',
               fontWeight: '700',
             }}

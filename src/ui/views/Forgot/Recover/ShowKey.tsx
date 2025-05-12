@@ -111,7 +111,7 @@ const ShowKey = ({ handleSwitchTab, mnemonic }) => {
                 opacity: isCoverBlur ? 0 : 1,
                 // visibility: isCoverBlur ? 'hidden' : 'visible',
                 //   ':hover': {
-                //     bgcolor: '#41CC5D',
+                //     bgcolor: '#009DD5',
                 //   },
               }}
             >
@@ -146,7 +146,7 @@ const ShowKey = ({ handleSwitchTab, mnemonic }) => {
                 sx={{
                   backgroundColor: 'neutral1.main',
                   //   ':hover': {
-                  //     bgcolor: '#41CC5D',
+                  //     bgcolor: '#009DD5',
                   //   },
                 }}
               >

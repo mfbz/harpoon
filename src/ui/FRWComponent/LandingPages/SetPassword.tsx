@@ -78,7 +78,7 @@ const SetPassword: React.FC<SetPasswordProps> = ({
         alignItems: 'center',
       }}
     >
-      <CheckCircleIcon size={24} color={'#41CC5D'} style={{ margin: '8px' }} />
+      <CheckCircleIcon size={24} color={'#009DD5'} style={{ margin: '8px' }} />
       <Typography variant="body1" color="success.main">
         {message}
       </Typography>

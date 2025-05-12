@@ -51,7 +51,7 @@ const RegisterHeader = ({ showAppButton = false }: RegisterHeaderProps) => {
             borderRadius: '12px',
             textTransform: 'capitalize',
             ':hover': {
-              bgcolor: '#41CC5D',
+              bgcolor: '#009DD5',
             },
           }}
           startIcon={<HelpOutlineRoundedIcon sx={{ color: '#5e5e5e' }} />}

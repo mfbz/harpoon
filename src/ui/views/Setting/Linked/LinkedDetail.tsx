@@ -591,7 +591,7 @@ const LinkedDetail = () => {
                       size="small"
                       icon={<CircleOutlinedIcon sx={{ width: '16px', height: '16px' }} />}
                       sx={{ paddingLeft: '10px' }}
-                      checkedIcon={<CheckCircleIcon color={'#41CC5D'} />}
+                      checkedIcon={<CheckCircleIcon color={'#009DD5'} />}
                       value="mainnet"
                       checked={hideEmpty}
                       onClick={toggleHide}

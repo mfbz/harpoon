@@ -127,7 +127,7 @@ const SyncQr = ({ uri, loadingString, secondLine }: SyncQrProps) => {
                     }}
                     value={uri}
                     logoImage={lilo}
-                    eyeColor={'#41CC5D'}
+                    eyeColor={'#009DD5'}
                     eyeRadius={24}
                     quietZone={20}
                   />
@@ -154,7 +154,7 @@ const SyncQr = ({ uri, loadingString, secondLine }: SyncQrProps) => {
                     variant="body1"
                     sx={{
                       width: '150px',
-                      color: '#41CC5D',
+                      color: '#009DD5',
                       lineHeight: '24px',
                       fontWeight: '700',
                       pt: '14px',
@@ -168,7 +168,7 @@ const SyncQr = ({ uri, loadingString, secondLine }: SyncQrProps) => {
                     variant="body1"
                     sx={{
                       width: '150px',
-                      color: '#41CC5D',
+                      color: '#009DD5',
                       lineHeight: '24px',
                       fontWeight: '700',
                       fontSize: '14px',

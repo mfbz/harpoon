@@ -40,7 +40,7 @@ const genHelperText = (
         alignItems: 'center',
       }}
     >
-      <CheckCircleIcon size={24} color={'#41CC5D'} style={{ margin: '8px' }} />
+      <CheckCircleIcon size={24} color={'#009DD5'} style={{ margin: '8px' }} />
       <Typography variant="body2" color="text.success">
         {successMsg || chrome.i18n.getMessage('Sounds_good')}
       </Typography>

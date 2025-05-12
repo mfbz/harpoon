@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "FlowWallet-dev",
+  "name": "HarpoonWallet-Dev",
   "short_name": "__MSG_appName__",
   "version": "2.6.3",
   "default_locale": "en",
@@ -24,7 +24,7 @@
       "128": "images/icon-128.png"
     },
     "default_popup": "popup.html",
-    "default_title": "Flow Wallet"
+    "default_title": "Harpoon Wallet"
   },
   "author": "https://core.flow.com/",
   "background": {
@@ -39,7 +39,7 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self' 'wasm-unsafe-eval';"
   },
-  "permissions": ["storage", "activeTab", "tabs", "notifications", "identity", "camera"],
+  "permissions": ["storage", "activeTab", "tabs", "notifications", "identity"],
   "host_permissions": ["https://api.mixpanel.com/*"],
   "web_accessible_resources": [
     {

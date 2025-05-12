@@ -30,14 +30,14 @@
 <stop offset="1" stop-color="#1E1E1E"/>
 </linearGradient>
 <radialGradient id="paint2_radial_3669_348" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(220.029 119.998) rotate(42.9302) scale(86.1479 162.716)">
-<stop stop-color="#41CC5D"/>
-<stop offset="0.416667" stop-color="#41CC5D" stop-opacity="0.42"/>
+<stop stop-color="#009DD5"/>
+<stop offset="0.416667" stop-color="#009DD5" stop-opacity="0.42"/>
 <stop offset="1" stop-color="#FFDD32" stop-opacity="0"/>
 </radialGradient>
 <radialGradient id="paint3_radial_3669_348" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(282.358 15.0199) rotate(-154.942) scale(136.597 104.134)">
 <stop stop-color="#7678ED"/>
 <stop offset="0.536458" stop-color="#7678ED" stop-opacity="0.56"/>
-<stop offset="1" stop-color="#41CC5D" stop-opacity="0"/>
+<stop offset="1" stop-color="#009DD5" stop-opacity="0"/>
 </radialGradient>
 </defs>
 </svg>

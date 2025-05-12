@@ -89,7 +89,9 @@ const useStyles = makeStyles(() => ({
 }));
 
 const orange = {
-  500: '#41CC5D',
+  400: '#BABABA',
+  500: '#009DD5',
+  600: '#5E5E5E',
 };
 
 const grey = {
