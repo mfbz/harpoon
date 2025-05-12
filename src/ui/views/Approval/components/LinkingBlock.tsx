@@ -122,7 +122,7 @@ export const LinkingBlock = ({ image, accountTitle, userInfo }) => {
           Wallet
         </Typography>
         <Typography sx={{ fontSize: '14px', color: '#FFFFFF', marginTop: '8px' }}>
-          <img className={classes.IconCheck} src={IconCheck} /> Flow Wallet will manage linked
+          <img className={classes.IconCheck} src={IconCheck} /> Harpoon Wallet will manage linked
           account{' '}
         </Typography>
       </Box>

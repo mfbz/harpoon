@@ -340,7 +340,7 @@ const SendToAddress = () => {
         if (!reg.test(data.address)) {
           address = '0x' + data.address;
         }
-        lilicoResult['group'] = 'Flow Wallet user';
+        lilicoResult['group'] = 'Harpoon Wallet user';
         lilicoResult.address = address;
         lilicoResult.contact_name = data.username;
         lilicoResult.domain!.domain_type = 999;

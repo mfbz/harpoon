@@ -268,7 +268,7 @@ const Sync = () => {
             projectId: process.env.WC_PROJECTID,
           }),
           metadata: {
-            name: 'Flow Wallet',
+            name: 'Harpoon Wallet',
             description: 'Digital wallet created for everyone.',
             url: extensionOrigin,
             icons: ['https://fcw-link.lilico.app/logo.png'],

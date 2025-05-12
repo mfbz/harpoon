@@ -16,7 +16,7 @@ async function release(): Promise<Version> {
   const input: { version: Version } = await prompt({
     type: 'input',
     name: 'version',
-    message: '[Flow Wallet] Please input the release version:',
+    message: '[Harpoon Wallet] Please input the release version:',
   });
   const manifestPath = path.resolve(PROJECT_ROOT, '_raw', 'manifest.json');
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));

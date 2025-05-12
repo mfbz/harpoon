@@ -17,7 +17,7 @@ function initAppMeta() {
   head?.appendChild(icon);
   const name = document.createElement('meta');
   name.name = 'name';
-  name.content = 'Flow Wallet';
+  name.content = 'Harpoon Wallet';
   head?.appendChild(name);
   const description = document.createElement('meta');
   description.name = 'description';

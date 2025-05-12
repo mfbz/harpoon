@@ -207,7 +207,7 @@ export class WalletController extends BaseController {
     return provider({
       data,
       session: {
-        name: 'Flow Wallet',
+        name: 'Harpoon Wallet',
         origin: INTERNAL_REQUEST_ORIGIN,
         icon: './images/icon-128.png',
       },
@@ -1312,7 +1312,7 @@ export class WalletController extends BaseController {
       apiResponse?.data?.users?.map((user, index): Contact => {
         const address = withPrefix(user.address) || '';
         return {
-          group: 'Flow Wallet User',
+          group: 'Harpoon Wallet User',
           address: address,
           contact_name: user.nickname,
           username: user.username,

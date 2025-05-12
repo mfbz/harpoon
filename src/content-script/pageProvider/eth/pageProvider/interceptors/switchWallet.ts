@@ -12,7 +12,7 @@ export const switchWalletNotice = (type: 'frw' | 'metamask') => {
     return;
   }
   const titles = {
-    flow: 'Flow Wallet',
+    flow: 'Harpoon Wallet',
     metamask: 'MetaMask',
   };
   if (instance) {
@@ -30,7 +30,7 @@ export const switchWalletNotice = (type: 'frw' | 'metamask') => {
         <div>
         Please <a
           href="javascript:window.location.reload();"
-          style="color: #8697FF; text-decoration: underline;">refresh the web page</a> 
+          style="color: #8697FF; text-decoration: underline;">refresh the web page</a>
         and retry
         </div>
       </div>

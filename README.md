@@ -191,7 +191,7 @@ The UI communicates with the background service worker using the `chrome.runtime
 
 ### Workflow
 
-We work on the `dev` branch of the repository. Before you start working on the extension, create a branch for the feature you're working on from the `dev` branch. We then have a Github project that co-ordinates features between the iOS, Android, and web extension teams. Please link the issue to the Flow Wallet project and update status as you work on the feature.
+We work on the `dev` branch of the repository. Before you start working on the extension, create a branch for the feature you're working on from the `dev` branch. We then have a Github project that co-ordinates features between the iOS, Android, and web extension teams. Please link the issue to the Harpoon Wallet project and update status as you work on the feature.
 
 1. Always create a new branch from the `dev` branch.
 2. When you're ready to merge your branch into `dev`, create a pull request from your branch to the `dev` branch.

@@ -196,7 +196,7 @@ const TokenDetail = () => {
                   color: 'error.main',
                 }}
               >
-                Flow Wallet doesn't have access to {`${token}`} in
+                Harpoon Wallet doesn't have access to {`${token}`} in
                 {`${walletName.name}`} Account, please check your linked account settings.
               </Typography>
             </Box>

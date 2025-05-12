@@ -654,9 +654,9 @@ class UserWallet {
   private extractScriptName = (cadence: string): string => {
     const scriptLines = cadence.split('\n');
     for (const line of scriptLines) {
-      if (line.includes('// Flow Wallet')) {
-        // '    // Flow Wallet - testnet Script  sendNFT - v2.31'
-        const nameMatch = line.match(/\/\/ Flow Wallet -\s*(testnet|mainnet)\s*Script\s+(\w+)/);
+      if (line.includes('// Harpoon Wallet')) {
+        // '    // Harpoon Wallet - testnet Script  sendNFT - v2.31'
+        const nameMatch = line.match(/\/\/ Harpoon Wallet -\s*(testnet|mainnet)\s*Script\s+(\w+)/);
         return nameMatch ? nameMatch[2] : 'unknown_script';
       }
     }

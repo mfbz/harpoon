@@ -90,7 +90,7 @@ export const TransactionBlock = ({ title, data, logo, lilicoEnabled, decodedCall
                   textAlign: 'right',
                 }}
               >
-                Covered by Flow Wallet
+                Covered by Harpoon Wallet
               </Typography>
             </Box>
           ) : (

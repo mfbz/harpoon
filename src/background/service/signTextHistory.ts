@@ -53,7 +53,7 @@ class PermissionService {
       site = {
         origin: INTERNAL_REQUEST_ORIGIN,
         icon: '',
-        name: 'Flow Wallet',
+        name: 'Harpoon Wallet',
         chain: 646,
         isSigned: false,
         isTop: false,

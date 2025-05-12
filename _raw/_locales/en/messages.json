@@ -91,7 +91,7 @@
     "message": "Anonymous"
   },
   "Other__Lilico__users__cannot__search__for__your__username": {
-    "message": "Other Flow Wallet users cannot search for your username."
+    "message": "Other Harpoon Wallet users cannot search for your username."
   },
   "Private__Key": {
     "message": "Private Key"
@@ -148,7 +148,7 @@
     "message": "FREE"
   },
   "Lilico__domain": {
-    "message": "Flow Wallet domain."
+    "message": "Harpoon Wallet domain."
   },
   "Edit__Address": {
     "message": "Edit Address"
@@ -271,7 +271,7 @@
     "message": "Are you sure you want to reset your wallet?"
   },
   "Removing__the__wallet__from__Lilico__does__not__remove__the__wallet__from__Flow__blockchain": {
-    "message": "Removing the wallet from Flow Wallet does not remove the wallet from Flow blockchain. You can import your wallet again using your Recovery Phrase or Google Drive Backup."
+    "message": "Removing the wallet from Harpoon Wallet does not remove the wallet from Flow blockchain. You can import your wallet again using your Recovery Phrase or Google Drive Backup."
   },
   "Reset": {
     "message": "Reset"
@@ -304,7 +304,7 @@
     "message": "Security"
   },
   "Allow__lilico__to__pay__the__gas__fee": {
-    "message": "Allow Flow Wallet to pay the gas fee for all my transactions."
+    "message": "Allow Harpoon Wallet to pay the gas fee for all my transactions."
   },
   "This__feature__has__been__disabled__temporarily": {
     "message": "This feature has been disabled temporarily"
@@ -382,7 +382,7 @@
     "message": "SCRIPT"
   },
   "lilico__covers__this__gas__fee__for__you": {
-    "message": "Flow Wallet covers this gas fee for you "
+    "message": "Harpoon Wallet covers this gas fee for you "
   },
   "SIGN__MESSAGE": {
     "message": "SIGN MESSAGE"
@@ -562,7 +562,7 @@
     "message": "Launch My Wallet"
   },
   "Start__exploring__with__Lilico__now": {
-    "message": "Start exploring with Flow Wallet now!"
+    "message": "Start exploring with Harpoon Wallet now!"
   },
   "all__set": {
     "message": "all set"
@@ -571,10 +571,10 @@
     "message": "You're"
   },
   "Flow_Core": {
-    "message": "Flow Wallet"
+    "message": "Harpoon Wallet"
   },
   "Lilico": {
-    "message": "Flow Wallets"
+    "message": "Harpoon Wallets"
   },
   "and__Pin": {
     "message": "and Pin"
@@ -607,7 +607,7 @@
     "message": "Pick Your "
   },
   "Your__username__will__be__used__to__send__and__receive": {
-    "message": "Your username will be used to send and receive tokens with your friends on Flow Wallet."
+    "message": "Your username will be used to send and receive tokens with your friends on Harpoon Wallet."
   },
   "Okay__I__have__saved__it__properly": {
     "message": "Okay, I have saved it properly"
@@ -661,10 +661,10 @@
     "message": "Terms of Service"
   },
   "Lilico__uses__this__password__to__protect__your__recovery__phrase": {
-    "message": "Flow Wallet uses this password to protect your recovery phrase."
+    "message": "Harpoon Wallet uses this password to protect your recovery phrase."
   },
   "I__agree__to__Lilico": {
-    "message": "I agree to Flow Wallet's"
+    "message": "I agree to Harpoon Wallet's"
   },
   "Try__again": {
     "message": "Try again"
@@ -676,7 +676,7 @@
     "message": "Welcome Back "
   },
   "Use__the__same__Google__Drive__password": {
-    "message": "Use the same Google Drive password to secure Flow Wallet"
+    "message": "Use the same Google Drive password to secure Harpoon Wallet"
   },
   "Please__enter__your__password__to__decrypt": {
     "message": "Please enter your password to decrypt your wallet backup."
@@ -724,7 +724,7 @@
     "message": " all set"
   },
   "You_can_start_experiencing_Lilico_now": {
-    "message": "You can start experiencing Flow Wallet now!"
+    "message": "You can start experiencing Harpoon Wallet now!"
   },
   "Back_up": {
     "message": "Back Up"
@@ -760,7 +760,7 @@
     "message": "I agree to the "
   },
   "of_Lilico_Wallet": {
-    "message": " of Flow Wallet."
+    "message": " of Harpoon Wallet."
   },
   "Login": {
     "message": "Login"
@@ -859,7 +859,7 @@
     "message": "Cannot login"
   },
   "Welcome_to_lilico": {
-    "message": "Welcome to Flow Wallet"
+    "message": "Welcome to Harpoon Wallet"
   },
   "Flow": {
     "message": "Flow"
@@ -1111,13 +1111,13 @@
     "message": "Private key is invalid"
   },
   "Open_your_Flow_Reference_on_Mobil": {
-    "message": "Open your Flow Wallet mobile app and scan the QR code to sync your wallets. Syncing your Flow Wallets allows your Flow account to be used across your Flow Wallet apps."
+    "message": "Open your Harpoon Wallet mobile app and scan the QR code to sync your wallets. Syncing your Harpoon Wallets allows your Flow account to be used across your Harpoon Wallet apps."
   },
   "Sync_": {
     "message": "Sync"
   },
   "Note_Your_recovery_phrase_will_not": {
-    "message": "Note: Your recovery phrase will NEVER go through Flow Wallet's server. It is end-to-end encrypted and we can never read it."
+    "message": "Note: Your recovery phrase will NEVER go through Harpoon Wallet's server. It is end-to-end encrypted and we can never read it."
   },
   "Scan_Successfully": {
     "message": "Scan Successfully"
@@ -1261,7 +1261,7 @@
     "message": "Date"
   },
   "Link_Flow_Reference_Wallet_Mobile_by_Scanning": {
-    "message": "Link Flow Wallet Mobile by Scanning the QR code"
+    "message": "Link Harpoon Wallet Mobile by Scanning the QR code"
   },
   "Current_Sessions": {
     "message": "Current Sessions"

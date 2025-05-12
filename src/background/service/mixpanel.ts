@@ -198,7 +198,7 @@ class MixpanelService {
     await this.init();
 
     await this.track('$mp_web_page_view', {
-      current_page_title: 'Flow Wallet',
+      current_page_title: 'Harpoon Wallet',
       current_domain: 'flow-extension',
       current_url_path: pathname,
       current_url_protocol: 'chrome-extension:',

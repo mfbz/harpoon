@@ -100,7 +100,7 @@
     "message": "Анонимный"
   },
   "Other__Lilico__users__cannot__search__for__your__username": {
-    "message": "Другие пользователи Flow Wallet не могут искать ваше имя пользователя."
+    "message": "Другие пользователи Harpoon Wallet не могут искать ваше имя пользователя."
   },
   "Private__Key": {
     "message": "Приватный ключ"
@@ -157,7 +157,7 @@
     "message": "БЕСПЛАТНЫЙ"
   },
   "Lilico__domain": {
-    "message": "Домен Flow Wallet."
+    "message": "Домен Harpoon Wallet."
   },
   "Edit__Address": {
     "message": "Изменить адрес"
@@ -274,7 +274,7 @@
     "message": "Вы уверены, что хотите сбросить ваш кошелек?"
   },
   "Removing__the__wallet__from__Lilico__does__not__remove__the__wallet__from__Flow__blockchain": {
-    "message": "Удаление кошелька из Flow Wallet не удаляет кошелек из блокчейна Flow. Вы можете импортировать ваш кошелек снова, используя резервную копию фразы или Google Drive."
+    "message": "Удаление кошелька из Harpoon Wallet не удаляет кошелек из блокчейна Flow. Вы можете импортировать ваш кошелек снова, используя резервную копию фразы или Google Drive."
   },
   "Reset": {
     "message": "Reset"
@@ -562,7 +562,7 @@
     "message": "Запустить мой кошелек"
   },
   "Start__exploring__with__Lilico__now": {
-    "message": "Начните изучать с Flow Wallet сейчас!"
+    "message": "Начните изучать с Harpoon Wallet сейчас!"
   },
   "all__set": {
     "message": "всё установлено"
@@ -571,10 +571,10 @@
     "message": "Вы"
   },
   "Flow_Core": {
-    "message": "Flow Wallet"
+    "message": "Harpoon Wallet"
   },
   "Lilico": {
-    "message": "Flow Wallets"
+    "message": "Harpoon Wallets"
   },
   "and__Pin": {
     "message": "и Пин-код"
@@ -607,7 +607,7 @@
     "message": "Выберите ваш "
   },
   "Your__username__will__be__used__to__send__and__receive": {
-    "message": "Ваше имя пользователя будет использоваться для отправки и получения жетонов с друзьями на Flow Wallet."
+    "message": "Ваше имя пользователя будет использоваться для отправки и получения жетонов с друзьями на Harpoon Wallet."
   },
   "Okay__I__have__saved__it__properly": {
     "message": "Хорошо, я сохранил его правильно"
@@ -661,10 +661,10 @@
     "message": "Условия предоставления услуг"
   },
   "Lilico__uses__this__password__to__protect__your__recovery__phrase": {
-    "message": "Flow Wallet использует этот пароль для защиты вашей фразы восстановления."
+    "message": "Harpoon Wallet использует этот пароль для защиты вашей фразы восстановления."
   },
   "I__agree__to__Lilico": {
-    "message": "Я согласен с Flow Wallet"
+    "message": "Я согласен с Harpoon Wallet"
   },
   "Try__again": {
     "message": "Попробовать еще раз"
@@ -676,7 +676,7 @@
     "message": "С возвращением "
   },
   "Use__the__same__Google__Drive__password": {
-    "message": "Используйте тот же пароль Google Drive для защиты кошелька Flow Wallet"
+    "message": "Используйте тот же пароль Google Drive для защиты кошелька Harpoon Wallet"
   },
   "Please__enter__your__password__to__decrypt": {
     "message": "Пожалуйста, введите пароль для расшифровки резервной копии кошелька."
@@ -733,7 +733,7 @@
     "message": " всё установлено"
   },
   "You_can_start_experiencing_Lilico_now": {
-    "message": "Вы можете начать испытывать Flow Wallet сейчас!"
+    "message": "Вы можете начать испытывать Harpoon Wallet сейчас!"
   },
   "Back_up": {
     "message": "Резервная копия"
@@ -868,7 +868,7 @@
     "message": "Не можете войти"
   },
   "Welcome_to_lilico": {
-    "message": "Добро пожаловать в Flow Wallet"
+    "message": "Добро пожаловать в Harpoon Wallet"
   },
   "Flow": {
     "message": "Поток"
@@ -889,7 +889,7 @@
     "message": " Это удалит эту резервную копию Google. Вы не будете импортировать этот кошелек через резервную копию Google."
   },
   "Your_lilico_domain_will_look_like": {
-    "message": "Ваш домен Flow Wallet будет выглядеть так:"
+    "message": "Ваш домен Harpoon Wallet будет выглядеть так:"
   },
   "meow": {
     "message": ".меу"
@@ -1096,7 +1096,7 @@
     "message": "Аккаунты, найденные в блокчейне"
   },
   "Support_Flow_Wallet_and_private_key": {
-    "message": "Поддержка Flow Wallet, Blocto, секретной фразы, ключевого хранилища и приватного ключа"
+    "message": "Поддержка Harpoon Wallet, Blocto, секретной фразы, ключевого хранилища и приватного ключа"
   },
   "Import_Address": {
     "message": "Импортировать адрес"
@@ -1123,13 +1123,13 @@
     "message": "Приватный ключ недействителен"
   },
   "Open_your_Flow_Reference_on_Mobil": {
-    "message": "Откройте мобильное приложение Flow Wallet и отсканируйте QR-код для синхронизации ваших кошельков. Синхронизация ваших Flow Wallets позволяет использовать ваш аккаунт Flow в ваших приложениях Flow Wallet."
+    "message": "Откройте мобильное приложение Harpoon Wallet и отсканируйте QR-код для синхронизации ваших кошельков. Синхронизация ваших Harpoon Wallets позволяет использовать ваш аккаунт Flow в ваших приложениях Harpoon Wallet."
   },
   "Sync_": {
     "message": "Синхронизация"
   },
   "Note_Your_recovery_phrase_will_not": {
-    "message": "Примечание: Ваша фраза восстановления НИКОГДА не проходит через сервер Flow Wallet. Она зашифрована с конца в конец, и мы никогда не сможем ее прочитать."
+    "message": "Примечание: Ваша фраза восстановления НИКОГДА не проходит через сервер Harpoon Wallet. Она зашифрована с конца в конец, и мы никогда не сможем ее прочитать."
   },
   "Scan_Successfully": {
     "message": "Сканирование успешно"
@@ -1147,7 +1147,7 @@
     "message": "Импортировать другие кошельки"
   },
   "Support_Flow_Wallet_Blocto": {
-    "message": "Поддержка Flow Wallet, keystore и raw ключа"
+    "message": "Поддержка Harpoon Wallet, keystore и raw ключа"
   },
   "A_crypto_wallet_on_Flow": {
     "message": "Криптокошелек на Flow для исследователей, коллекционеров и геймеров"

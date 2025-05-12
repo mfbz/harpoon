@@ -99,7 +99,7 @@ graph TD
   class Q,B,C,E highlighted
 ```
 
-There is no “default” or “root” account associated with a public key - every main account has the same capabilities in Flow Wallet. When you login though, we take the user to the first account created.
+There is no “default” or “root” account associated with a public key - every main account has the same capabilities in Harpoon Wallet. When you login though, we take the user to the first account created.
 
 ## Main Accounts
 
@@ -176,7 +176,7 @@ For example, a wallet might have have access to all the accounts associated with
 
 ## Child & EVM Accounts
 
-Each “Main Account” can have child accounts. A Main account could have a child EVM account to interact with the Ethereum network or a Child dapper account (using Cadence). When a new account is created in Flow Wallet, we _always_ create a single EVM account with it. It is possible though to import an account that has no EVM account. Other child accounts - like Dapper accounts - are linked to a Main Account through dApps.
+Each “Main Account” can have child accounts. A Main account could have a child EVM account to interact with the Ethereum network or a Child dapper account (using Cadence). When a new account is created in Harpoon Wallet, we _always_ create a single EVM account with it. It is possible though to import an account that has no EVM account. Other child accounts - like Dapper accounts - are linked to a Main Account through dApps.
 
 ```mermaid
 graph TD
@@ -213,7 +213,7 @@ However, fees always come from the main account if performing an operation on a 
 
 ## Profiles
 
-A user can setup multiple profiles in flow wallet. A profile has:
+A user can setup multiple profiles in harpoon wallet. A profile has:
 
 - A nickname - whatever the user sets when they register
 - A globally unique username - the nickname with a number at the end
@@ -221,7 +221,7 @@ A user can setup multiple profiles in flow wallet. A profile has:
 
 There is no linkage between profiles.
 
-Currently, creating or importing a new account in flow wallet creates a new profile. If you try to import a public/private Keypair that already exists in a profile, then you will simply be logged into that existing profile - it will not allow you to import the same public/private key-pair twice.
+Currently, creating or importing a new account in harpoon wallet creates a new profile. If you try to import a public/private Keypair that already exists in a profile, then you will simply be logged into that existing profile - it will not allow you to import the same public/private key-pair twice.
 
 <aside>
 💡 The wallet supports **one private key per profile.**
@@ -230,7 +230,7 @@ Currently, creating or importing a new account in flow wallet creates a new prof
 
 ## Password
 
-It is only possible to have one password in Flow Wallet. This is used to access all profiles.
+It is only possible to have one password in Harpoon Wallet. This is used to access all profiles.
 
 ## Public Key Weights
 

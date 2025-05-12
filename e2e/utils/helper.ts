@@ -194,7 +194,7 @@ export const registerAccount = async ({ page, extensionId, username, password })
   // fill
   await fillInPassword({ page, password });
 
-  await page.getByLabel("I agree to Flow Wallet's").click();
+  await page.getByLabel("I agree to Harpoon Wallet's").click();
 
   const registerBtn = await page.getByRole('button', { name: 'Register' });
   await registerBtn.click();

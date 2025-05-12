@@ -467,7 +467,7 @@ const EIP6963Icon =
 const announceEip6963Provider = (provider: EthereumProvider) => {
   const info: EIP6963ProviderInfo = {
     uuid: uuid,
-    name: 'Flow Wallet',
+    name: 'Harpoon Wallet',
     icon: EIP6963Icon,
     rdns: 'com.flowfoundation.wallet',
   };

@@ -142,7 +142,7 @@ export enum PeriodFrequency {
  * 0: External - an external address
  * 1: Address Book - a contact in the address book
  * 2: Domain - from a domain name
- * 4: User - a flow wallet user
+ * 4: User - a harpoon wallet user
  */
 
 export const ContactType = {
