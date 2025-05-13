@@ -21,13 +21,13 @@ const useStyles = makeStyles(() => ({
     marginTop: '16px',
     marginBottom: '4px',
     width: '100%',
-    color: '#8C8C8C',
+    color: '#00B4D8',
   },
   subtitle: {
     fontSize: '14px',
     lineHeight: '20px',
     width: '100%',
-    color: '#8C8C8C',
+    color: '#00B4D8',
   },
 }));
 
@@ -45,7 +45,7 @@ function EmptyStatus() {
           marginTop: '8px',
           marginBottom: '4px',
           width: '100%',
-          color: '#8C8C8C',
+          color: '#00B4D8',
         }}
       >
         {chrome.i18n.getMessage('We__did__not__find__anything__here')}
@@ -55,7 +55,7 @@ function EmptyStatus() {
           fontSize: '14px',
           lineHeight: '20px',
           width: '100%',
-          color: '#8C8C8C',
+          color: '#00B4D8',
         }}
       >
         {chrome.i18n.getMessage('Looking__forward__to__your__new__discovery')}

@@ -16,13 +16,13 @@ import { useWallet } from 'ui/utils';
 
 import EditAccount from './EditAccount';
 const orange = {
-  500: '#009DD5',
+  500: '#00B4D8',
 };
 
 const grey = {
-  400: '#BABABA',
-  500: '#787878',
-  600: '#5E5E5E',
+  400: '#00B4D8',
+  500: '#00B4D8',
+  600: '#02033B',
 };
 
 const Root = styled('span')(
@@ -233,7 +233,7 @@ const AccountSettings = () => {
         }}
       >
         <IconButton onClick={() => history.push('/dashboard/setting')}>
-          <ArrowBackIcon fontSize="medium" sx={{ color: 'icon.navi', cursor: 'pointer' }} />
+          <ArrowBackIcon fontSize="medium" sx={{ color: '#00B4D8', cursor: 'pointer' }} />
         </IconButton>
         <Typography
           variant="h1"
@@ -250,7 +250,7 @@ const AccountSettings = () => {
             toggleEdit();
           }}
         >
-          <EditRoundedIcon fontSize="medium" sx={{ color: 'icon.navi', cursor: 'pointer' }} />
+          <EditRoundedIcon fontSize="medium" sx={{ color: '#00B4D8', cursor: 'pointer' }} />
         </IconButton>
       </Box>
       <Box
@@ -299,7 +299,7 @@ const AccountSettings = () => {
         >
           <Box
             sx={{
-              backgroundColor: '#282828',
+              backgroundColor: '#02033B',
               display: 'flex',
               padding: '20px 24px',
               justifyContent: 'space-between',
@@ -333,7 +333,7 @@ const AccountSettings = () => {
 
           <Box
             sx={{
-              backgroundColor: '#282828',
+              backgroundColor: '#02033B',
               display: 'flex',
               padding: '20px 24px',
               justifyContent: 'center',
@@ -359,7 +359,7 @@ const AccountSettings = () => {
 
           <Box
             sx={{
-              backgroundColor: '#282828',
+              backgroundColor: '#02033B',
               display: 'flex',
               padding: '20px 24px',
               justifyContent: 'center',

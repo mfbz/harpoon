@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   addressDropdown: {
     height: '56px',
     borderRadius: '16px',
-    backgroundColor: '#282828',
+    backgroundColor: '#02033B',
     color: 'white',
     width: '100%',
     '&.MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline': {

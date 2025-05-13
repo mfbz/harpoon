@@ -41,7 +41,7 @@ const useStyles = makeStyles(() => ({
     width: 'auto',
     height: 'auto',
     margin: '10px 20px',
-    backgroundColor: '#282828',
+    backgroundColor: '#02033B',
     padding: '24px 20px',
     display: 'flex',
     flexDirection: 'row',
@@ -52,7 +52,7 @@ const useStyles = makeStyles(() => ({
   gasBox: {
     width: '90%',
     margin: '10px auto',
-    backgroundColor: '#282828',
+    backgroundColor: '#02033B',
     padding: '20px 24px',
     display: 'flex',
     flexDirection: 'row',
@@ -64,7 +64,7 @@ const useStyles = makeStyles(() => ({
   radioBox: {
     width: '90%',
     borderRadius: '16px',
-    backgroundColor: '#282828',
+    backgroundColor: '#02033B',
     margin: '20px auto',
     // padding: '10px 24px',
   },
@@ -83,21 +83,21 @@ const useStyles = makeStyles(() => ({
     margin: 0,
     borderRadius: '16px',
     '&:hover': {
-      backgroundColor: '#282828',
+      backgroundColor: '#02033B',
     },
   },
 }));
 
 const orange = {
   400: '#BABABA',
-  500: '#009DD5',
-  600: '#5E5E5E',
+  500: '#00B4D8',
+  600: '#02033B',
 };
 
 const grey = {
-  400: '#BABABA',
-  500: '#787878',
-  600: '#5E5E5E',
+  400: '#00B4D8',
+  500: '#00B4D8',
+  600: '#02033B',
 };
 
 const Root = styled('span')(

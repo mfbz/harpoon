@@ -41,7 +41,7 @@ const useStyles = makeStyles(() => ({
     zIndex: '1400 !important',
   },
   paper: {
-    background: '#282828',
+    background: '#02033B',
   },
   active: {
     background: '#BABABA14',
@@ -91,7 +91,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
     return (
       <Typography
         sx={{
-          color: '#808080',
+          color: '#00B4D8',
           fontWeight: '400',
           fontSize: '12px',
           marginTop: '4px',
@@ -130,7 +130,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
     >
       <List
         sx={{
-          backgroundColor: '#282828',
+          backgroundColor: '#02033B',
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
@@ -223,7 +223,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           </ListItem>
         )}
         <Box sx={{ px: '16px' }}>
-          <Divider sx={{ my: '10px', mx: '0px' }} variant="middle" color="#4C4C4C" />
+          <Divider sx={{ my: '10px', mx: '0px' }} variant="middle" color="#00B4D8" />
         </Box>
         <Box sx={{ overflowY: 'scroll' }}>
           {props.walletList.length > 0 &&
@@ -389,7 +389,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                         height: '32px',
                         width: '32px',
                         marginRight: '12px',
-                        backgroundColor: '#282828',
+                        backgroundColor: '#02033B',
                         borderRadius: '24px',
                         objectFit: 'cover',
                       }}
@@ -430,7 +430,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                         variant="body1"
                         component="span"
                         // display="inline"
-                        color={'text.nonselect'}
+                        color={'#00B4D8'}
                         sx={{ fontSize: '12px', textTransform: 'lowercase' }}
                       >
                         {childAccount.address}

@@ -31,7 +31,7 @@ const useStyles = makeStyles(() => ({
   },
   detailContainer: {
     width: '100%',
-    backgroundColor: '#282828',
+    backgroundColor: '#02033B',
     borderRadius: '16px 16px 0 0',
     padding: '18px',
     margin: 0,

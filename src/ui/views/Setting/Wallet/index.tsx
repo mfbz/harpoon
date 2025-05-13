@@ -120,7 +120,7 @@ const Wallet = () => {
       <LLHeader title={chrome.i18n.getMessage('Acc__list')} help={false} />
       <Box sx={{ justifyContent: 'center', alignItems: 'center', width: '100%', px: '18px' }}>
         <Typography
-          sx={{ fontSize: '14px', fontWeight: '600', color: '#787878', margin: '20px 0 8px' }}
+          sx={{ fontSize: '14px', fontWeight: '600', color: '#00B4D8', margin: '20px 0 8px' }}
         >
           {chrome.i18n.getMessage('main_wallet')}
         </Typography>
@@ -128,7 +128,7 @@ const Wallet = () => {
           sx={{
             borderRadius: '16px',
             overflow: 'hidden',
-            backgroundColor: '#292929',
+            backgroundColor: '#02033B',
             margin: '8px auto 16px auto',
             pt: 0,
             pb: 0,
@@ -155,7 +155,7 @@ const Wallet = () => {
                   margin: '0 auto',
                   padding: '16px 20px',
                   '&:hover': {
-                    backgroundColor: '#262626',
+                    backgroundColor: '#02033B',
                   },
                 }}
               >
@@ -188,7 +188,7 @@ const Wallet = () => {
                       {item.name}
                     </Typography>
                     <Typography
-                      sx={{ color: '#808080', fontSize: '12px', fontWeight: '400' }}
+                      sx={{ color: '#00B4D8', fontSize: '12px', fontWeight: '400' }}
                     >{`(${item.address})`}</Typography>
                     {item.address === currentAddress && (
                       <ListItemIcon style={{ display: 'flex', alignItems: 'center' }}>
@@ -202,7 +202,7 @@ const Wallet = () => {
                       </ListItemIcon>
                     )}
                   </Box>
-                  <Typography sx={{ color: '#808080', fontSize: '12px', fontWeight: '400' }}>
+                  <Typography sx={{ color: '#00B4D8', fontSize: '12px', fontWeight: '400' }}>
                     {item.balance} Flow
                   </Typography>
                 </Box>
@@ -215,7 +215,7 @@ const Wallet = () => {
 
         {evmList.length > 0 && (
           <Typography
-            sx={{ fontSize: '14px', fontWeight: '600', color: '#787878', margin: '20px 0 8px' }}
+            sx={{ fontSize: '14px', fontWeight: '600', color: '#00B4D8', margin: '20px 0 8px' }}
           >
             {chrome.i18n.getMessage('multi_vm')}
           </Typography>
@@ -225,7 +225,7 @@ const Wallet = () => {
           sx={{
             borderRadius: '16px',
             overflow: 'hidden',
-            backgroundColor: '#292929',
+            backgroundColor: '#02033B',
             margin: '8px auto 16px auto',
             pt: 0,
             pb: 0,
@@ -282,7 +282,7 @@ const Wallet = () => {
                       {item.name}
                     </Typography>
                     <Typography
-                      sx={{ color: '#808080', fontSize: '12px', fontWeight: '400' }}
+                      sx={{ color: '#00B4D8', fontSize: '12px', fontWeight: '400' }}
                     >{`(${formatAddress(item.address)})`}</Typography>
                     <Typography
                       variant="body1"
@@ -302,7 +302,7 @@ const Wallet = () => {
                       EVM
                     </Typography>
                   </Box>
-                  <Typography sx={{ color: '#808080', fontSize: '12px', fontWeight: '400' }}>
+                  <Typography sx={{ color: '#00B4D8', fontSize: '12px', fontWeight: '400' }}>
                     {item.balance} Flow
                   </Typography>
                 </Box>

@@ -58,7 +58,7 @@ const TokenInfoCard = ({
     <Box
       sx={{
         width: '100%',
-        backgroundColor: '#121212',
+        backgroundColor: '#02033B',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'start',
@@ -76,7 +76,7 @@ const TokenInfoCard = ({
               style={{
                 height: '64px',
                 width: '64px',
-                backgroundColor: '#282828',
+                backgroundColor: '#02033B',
                 borderRadius: '32px',
               }}
               src={
@@ -102,7 +102,7 @@ const TokenInfoCard = ({
                   marginRight: '2px',
                   borderRadius: '8px',
                   alignSelf: 'start',
-                  background: 'linear-gradient(to right, #000000, #282828)',
+                  background: 'linear-gradient(to right, #02033B, #03045E)',
                   minWidth: 0,
                 }}
               >

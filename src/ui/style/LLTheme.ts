@@ -78,7 +78,7 @@ const themeOptions: ThemeOptions = {
       primary: '#F9F9F9',
       secondary: '#BABABA',
       // @ts-expect-error nonselect for the header text
-      nonselect: '#808080',
+      nonselect: '#00B4D8',
       title: '#E6E6E6',
       error: '#E54040',
       good: '#FF8A00',
@@ -121,7 +121,7 @@ const themeOptions: ThemeOptions = {
       contrastText: '#333333',
     },
     info: {
-      main: '#4f4f4f',
+      main: '#02033B',
       contrastText: '#F9F9F9',
     },
     info3: {
@@ -135,7 +135,7 @@ const themeOptions: ThemeOptions = {
     neutral: {
       main: '#02033B',
       text: '#8C9BAB',
-      light: '#343535',
+      light: '#02033B',
       contrastText: '#FFFFFF',
     },
     neutral1: {
@@ -144,16 +144,16 @@ const themeOptions: ThemeOptions = {
       contrastText: '#FFFFFF',
     },
     neutral2: {
-      main: '#5e5e5e',
+      main: '#02033B',
     },
     action: {
       disabledBackground: '#888888',
     },
     line: {
-      main: '#4C4C4C',
+      main: '#02033B',
     },
     icon: {
-      navi: '#787878',
+      navi: '#00B4D8',
     },
     up: {
       main: '#00EF8B',

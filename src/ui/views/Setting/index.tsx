@@ -46,7 +46,7 @@ const useStyles = makeStyles(() => ({
     width: '100%',
     overflow: 'hidden',
     '&:hover': {
-      backgroundColor: '#282828',
+      backgroundColor: '#02033B',
     },
   },
   itemButton: {
@@ -55,16 +55,16 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
     margin: '0 auto',
     '&:hover': {
-      backgroundColor: '#282828',
+      backgroundColor: '#02033B',
     },
   },
   list: {
     width: '90%',
     borderRadius: '16px',
     overflow: 'hidden',
-    backgroundColor: '#282828',
+    backgroundColor: '#02033B',
     '&:hover': {
-      backgroundColor: '#282828',
+      backgroundColor: '#02033B',
     },
   },
   listIcon: {

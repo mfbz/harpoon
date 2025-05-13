@@ -37,9 +37,9 @@ export const IconButton: React.FC<IconButtonProps> = ({
           minWidth: '38px',
           borderRadius: '50%',
           padding: '0 !important',
-          backgroundColor: '#1DB954', // Spotify-like green color
+          backgroundColor: '#00B4D8', // Blue color
           '&:hover': {
-            backgroundColor: '#1ed760', // Slightly lighter green on hover
+            backgroundColor: '#33c3e0', // Slightly lighter blue on hover
           },
           display: 'flex',
           justifyContent: 'center',

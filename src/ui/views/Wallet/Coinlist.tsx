@@ -165,7 +165,7 @@ const CoinList = ({
                   style={{
                     height: '16px',
                     width: '16px',
-                    backgroundColor: '#282828',
+                    backgroundColor: '#02033B',
                     borderRadius: '18px',
                     marginLeft: props.name.length * 8 > 160 ? '-8px' : '0',
                   }}
@@ -227,7 +227,7 @@ const CoinList = ({
                     marginTop: '2px',
                     fontSize: '10px',
                     fontFamily: 'Inter, sans-serif',
-                    backgroundColor: 'neutral1.light',
+                    backgroundColor: '#02033B',
                   }}
                 >
                   {chrome.i18n.getMessage('Inaccessible')}
@@ -312,7 +312,7 @@ const CoinList = ({
                           style={{
                             height: '36px',
                             width: '36px',
-                            backgroundColor: '#282828',
+                            backgroundColor: '#02033B',
                             borderRadius: '18px',
                           }}
                         />

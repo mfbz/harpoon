@@ -115,7 +115,7 @@ const CollectionView = ({
   return (
     <Card
       key={name}
-      sx={{ borderRadius: '12px', backgroundColor: '#000000' }}
+      sx={{ borderRadius: '12px', backgroundColor: '#02033B' }}
       className={classes.collectionCard}
     >
       <CardActionArea
@@ -150,7 +150,7 @@ const CollectionView = ({
                   <Typography
                     variant="body1"
                     sx={{ fontSize: '14px' }}
-                    color="#B2B2B2"
+                    color="#00B4D8"
                     component="div"
                   >
                     {count} {chrome.i18n.getMessage('collectibles')}
@@ -167,6 +167,7 @@ const CollectionView = ({
                       fontSize: '10px',
                       width: '80px',
                       fontFamily: 'Inter, sans-serif',
+                      backgroundColor: '#02033B',
                     }}
                   >
                     {chrome.i18n.getMessage('Inaccessible')}

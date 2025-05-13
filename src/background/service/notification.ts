@@ -42,7 +42,7 @@ class NotificationService extends Events {
         text: '1',
       });
       chrome.action.setBadgeBackgroundColor({
-        color: '#41CC5D',
+        color: '#00B4D8',
       });
     }
   }

@@ -221,7 +221,7 @@ const WalletTab = ({ network }) => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: 'black',
+        backgroundColor: '#02033B',
         width: '100%',
         height: '100%',
       }}
@@ -289,10 +289,10 @@ const WalletTab = ({ network }) => {
           position: 'sticky',
           top: '0',
           zIndex: 1100,
-          backgroundColor: 'black',
+          backgroundColor: '#02033B',
           '& .MuiTab-root': {
             minHeight: '48px',
-            color: '#777E90',
+            color: '#00B4D8',
             opacity: 1,
             position: 'relative',
             gap: '8px',
@@ -391,19 +391,21 @@ const WalletTab = ({ network }) => {
       </Tabs>
       <Box sx={{ flex: 1, overflow: 'hidden' }}>
         <TabPanel value={value} index={0}>
-          <Box sx={{ height: '100%', overflow: 'auto' }}>
+          <Box sx={{ height: '100%', overflow: 'auto', backgroundColor: '#02033B' }}>
             {value === 0 && (
               <CoinList ableFt={accessible} isActive={isActive} childType={childType} />
             )}
           </Box>
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <Box sx={{ height: '100%', overflow: 'auto' }}>
+          <Box sx={{ height: '100%', overflow: 'auto', backgroundColor: '#02033B' }}>
             {value === 1 && (childType === 'evm' ? <NftEvm /> : <NFTTab />)}
           </Box>
         </TabPanel>
         <TabPanel value={value} index={2}>
-          <Box sx={{ height: '100%', overflow: 'auto' }}>{value === 2 && <TransferList />}</Box>
+          <Box sx={{ height: '100%', overflow: 'auto', backgroundColor: '#02033B' }}>
+            {value === 2 && <TransferList />}
+          </Box>
         </TabPanel>
       </Box>
       <LLComingSoon alertOpen={alertOpen} handleCloseIconClicked={() => setAlertOpen(false)} />

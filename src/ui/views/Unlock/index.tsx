@@ -26,7 +26,7 @@ const useStyles = makeStyles(() => ({
     padding: '16px',
     magrinBottom: '64px',
     zIndex: '999',
-    backgroundColor: '#282828',
+    backgroundColor: '#02033B',
     border: '2px solid #4C4C4C',
     borderRadius: '12px',
     boxSizing: 'border-box',
@@ -117,7 +117,7 @@ const Unlock = () => {
       sx={{
         height: '100vh',
         width: '100%',
-        backgroundColor: '#282828',
+        backgroundColor: '#02033B',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',

@@ -617,7 +617,7 @@ const LinkedDetail = () => {
                   padding: '4px 16px',
                   flexShrink: 0,
                   borderRadius: 20,
-                  background: '#292929',
+                  background: '#02033B',
                   color: '#E6E6E6',
                   fontFamily: 'Inter',
                   fontSize: '12px',
@@ -627,8 +627,8 @@ const LinkedDetail = () => {
                   textTransform: 'capitalize',
                   minHeight: '0px',
                   '&.Mui-selected': {
-                    backgroundColor: 'rgba(50, 159, 227, 0.16)',
-                    color: ' #329FE3',
+                    backgroundColor: 'rgba(0, 180, 216, 0.16)',
+                    color: '#00B4D8',
                   },
                 }}
                 value="one"
@@ -639,7 +639,7 @@ const LinkedDetail = () => {
                   padding: '4px 16px',
                   flexShrink: 0,
                   borderRadius: 20,
-                  background: '#292929',
+                  background: '#02033B',
                   color: '#E6E6E6',
                   fontFamily: 'Inter',
                   fontSize: '12px',
@@ -650,8 +650,8 @@ const LinkedDetail = () => {
                   marginLeft: '8px',
                   minHeight: '0px',
                   '&.Mui-selected': {
-                    backgroundColor: 'rgba(50, 159, 227, 0.16)',
-                    color: ' #329FE3',
+                    backgroundColor: 'rgba(0, 180, 216, 0.16)',
+                    color: '#00B4D8',
                   },
                 }}
                 value="two"

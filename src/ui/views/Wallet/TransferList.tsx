@@ -92,7 +92,7 @@ const TransferList = () => {
                 fontSize: 12,
                 fontWeight: '500',
                 textAlign: 'end',
-                color: props.error ? '#E54040' : '#BABABA',
+                color: props.error ? '#E54040' : '#00B4D8',
               }}
             >
               {props.error ? chrome.i18n.getMessage('Error') : props.status}
@@ -139,7 +139,7 @@ const TransferList = () => {
             <Box sx={{ display: 'flex', gap: '3px' }}>
               <Typography
                 variant="body1"
-                sx={{ fontSize: 10, fontWeight: '500', textAlign: 'start' }}
+                sx={{ fontSize: 10, fontWeight: '500', textAlign: 'start', color: '#00B4D8' }}
               >
                 {timeConverter(props.time)}
               </Typography>
@@ -150,7 +150,7 @@ const TransferList = () => {
                   fontSize: 10,
                   fontWeight: '500',
                   textAlign: 'start',
-                  color: '#009DD5',
+                  color: '#00B4D8',
                 }}
               >
                 {props.txType === 1 && props.receiver && ` To ${formatString(props.receiver)}`}
@@ -191,7 +191,7 @@ const TransferList = () => {
                     disablePadding
                   >
                     <ListItemButton
-                      sx={{ paddingRight: '0px' }}
+                      sx={{ paddingRight: '0px', '&:hover': { backgroundColor: '#03045E' } }}
                       dense={true}
                       onClick={() => {
                         // Link to the first evm tx if there are multiple. Once the indexer updates, it'll show all the evm transactions
@@ -260,7 +260,7 @@ const TransferList = () => {
                 flexDirection: 'column',
                 justifyContent: 'center',
                 height: '100%',
-                backgroundColor: '#000',
+                backgroundColor: '#02033B',
               }}
             >
               <CardMedia
@@ -272,7 +272,7 @@ const TransferList = () => {
                 sx={{
                   lineHeight: '1',
                   textAlign: 'center',
-                  color: '#5E5E5E',
+                  color: '#00B4D8',
                   marginTop: '5px',
                   fontSize: '16px',
                 }}

@@ -39,7 +39,7 @@ const useStyles = makeStyles(() => ({
     py: '14px',
     zIndex: '999',
     fontSize: '24px',
-    backgroundColor: '#282828',
+    backgroundColor: '#02033B',
     borderRadius: '12px',
     boxSizing: 'border-box',
   },
@@ -54,7 +54,7 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     gap: '8px',
     color: '#CDD2D7',
-    border: '1px solid #282828',
+    border: '1px solid #02033B',
 
     // &.${selectUnstyledClasses.expanded} {
     //   &::after {
@@ -73,7 +73,7 @@ const useStyles = makeStyles(() => ({
       padding: '5px',
       margin: '10px 0',
       maxHeight: '400px',
-      backgroundColor: '#282828',
+      backgroundColor: '#02033B',
       border: 'none',
       borderRadius: '0.75em',
       color: '#CDD2D7',
@@ -93,8 +93,8 @@ const useStyles = makeStyles(() => ({
     padding: '5px',
     margin: '10px 0',
     maxHeight: '400px',
-    backgroundColor: '#282828',
-    border: '1px solid #787878',
+    backgroundColor: '#02033B',
+    border: '1px solid #00B4D8',
     borderRadius: '0.75em',
     color: '#CDD2D7',
     overflow: 'auto',

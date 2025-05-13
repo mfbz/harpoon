@@ -460,7 +460,7 @@ const SendToAddress = () => {
               onChange={(_, newValue: number) => setTabValue(newValue)}
               TabIndicatorProps={{
                 style: {
-                  backgroundColor: '#5a5a5a',
+                  backgroundColor: '#00B4D8',
                 },
               }}
               variant="fullWidth"

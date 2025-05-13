@@ -30,7 +30,7 @@ const useStyles = makeStyles(() => ({
     width: '100%',
     height: '100%',
     overflow: 'auto',
-    backgroundColor: 'black',
+    backgroundColor: '#02033B',
   },
   container: {
     display: 'flex',

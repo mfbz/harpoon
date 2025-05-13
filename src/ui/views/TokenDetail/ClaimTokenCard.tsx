@@ -45,7 +45,7 @@ const ClaimTokenCard = ({ token }) => {
             height: '60px',
             borderRadius: '30px',
             padding: '5px',
-            backgroundColor: '#282828',
+            backgroundColor: '#02033B',
           }}
         />
         <Box sx={{ flexGrow: 1 }} />

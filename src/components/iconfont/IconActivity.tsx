@@ -5,7 +5,7 @@ interface IconActivityProps {
   color?: string;
 }
 
-const IconActivity: React.FC<IconActivityProps> = ({ sx = {}, color = '#777E90' }) => {
+const IconActivity: React.FC<IconActivityProps> = ({ sx = {}, color = '#00B4D8' }) => {
   return (
     <svg
       width="16"

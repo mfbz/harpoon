@@ -45,7 +45,7 @@ const useStyles = makeStyles(() => ({
     zIndex: 1399,
   },
   paper: {
-    background: '#282828',
+    background: '#02033B',
   },
   active: {
     background: '#BABABA14',
@@ -327,7 +327,7 @@ const Header = ({ _loading = false }) => {
                 ? ''
                 : network !== 'mainnet'
                   ? `2px solid ${networkColor(network)}`
-                  : '2px solid #282828',
+                  : '2px solid #02033B',
               marginRight: '0px',
             }}
           >
@@ -484,7 +484,7 @@ const Header = ({ _loading = false }) => {
                         position: 'absolute',
                         top: '-2px',
                         right: '-2px',
-                        backgroundColor: '#4CAF50',
+                        backgroundColor: '#00B4D8',
                         color: 'black',
                         borderRadius: '50%',
                         minWidth: '18px',
@@ -531,7 +531,7 @@ const Header = ({ _loading = false }) => {
     <StyledEngineProvider injectFirst>
       <SwitchAccountCover open={switchLoading} />
       <AppBar position="relative" className={classes.appBar} elevation={0}>
-        <Toolbar sx={{ px: '12px', backgroundColor: '#282828' }}>
+        <Toolbar sx={{ px: '12px', backgroundColor: '#02033B' }}>
           {walletList && (
             <MenuDrawer
               userInfo={userInfo || null}

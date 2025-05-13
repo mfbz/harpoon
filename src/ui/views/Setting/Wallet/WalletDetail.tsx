@@ -139,9 +139,9 @@ const orange = {
 };
 
 const grey = {
-  400: '#BABABA',
-  500: '#787878',
-  600: '#5E5E5E',
+  400: '#00B4D8',
+  500: '#00B4D8',
+  600: '#02033B',
 };
 
 const Root = styled('span')(
