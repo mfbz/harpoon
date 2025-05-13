@@ -40,6 +40,7 @@ import Keydetail from './Setting/privatekey/Keydetail';
 import PrivateKeyPassword from './Setting/privatekey/Privatekeypassword';
 import RecoveryPhasesDetail from './Setting/recoveryphase/Recoveryphasedetail';
 import Recoveryphrasepassword from './Setting/recoveryphase/Recoveryphrasepassword';
+import RiftSettings from './Setting/RiftSettings/RiftSettings';
 import Security from './Setting/Security';
 import Settingone from './Setting/Settingone';
 import Switchaccount from './Setting/Switchaccount';
@@ -220,6 +221,10 @@ const InnerRoute = (props: RouteComponentProps) => {
             </PrivateRoute>
             <PrivateRoute path={`${props.match.url}/setting/developerMode`}>
               <DeveloperMode />
+            </PrivateRoute>
+
+            <PrivateRoute path={`${props.match.url}/setting/riftSettings`}>
+              <RiftSettings />
             </PrivateRoute>
 
             <PrivateRoute path={`${props.match.url}/setting/deviceinfo`}>

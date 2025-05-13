@@ -385,6 +385,203 @@ const extMessageHandler = (msg, sender, sendResponse) => {
         }
       });
   }
+
+  // Handle Rift protocol messages
+  if (msg.type === 'RIFT:GET_CONTEXT') {
+    (async () => {
+      try {
+        const address = await userWalletService.getCurrentAddress();
+        const network = await userWalletService.getNetwork();
+        sendResponse({
+          address: address || null,
+          network: network || 'mainnet',
+        });
+      } catch (error) {
+        console.error('Error getting context for Rift:', error);
+        sendResponse({ error: 'Failed to get wallet context' });
+      }
+    })();
+    return true; // Keep channel open for async response
+  }
+
+  if (msg.type === 'RIFT:EXECUTE_SCRIPT') {
+    // Execute script from Rift frame
+    (async () => {
+      try {
+        // Extract script details from request
+        const { payload } = msg;
+
+        // Execute the script
+        const result = await walletController.sendRequest({
+          cadence: payload.cadence,
+          args: payload.args || [],
+        });
+
+        // Send response back to the content script
+        sendResponse({ result });
+      } catch (error) {
+        console.error('Error executing Rift script:', error);
+        sendResponse({
+          error: error.message || 'Script execution failed',
+          status: 'error',
+        });
+      }
+    })();
+
+    return true; // Keep channel open for async response
+  }
+
+  if (msg.type === 'RIFT:EXECUTE_TRANSACTION') {
+    // Handle transaction from Rift frame
+    chrome.tabs
+      .query({
+        active: true,
+        lastFocusedWindow: true,
+      })
+      .then(async (tabs) => {
+        const tabId = tabs[0].id;
+
+        // Check if current address is flow address
+        try {
+          const currentAddress = await userWalletService.getCurrentAddress();
+          if (!isValidFlowAddress(currentAddress)) {
+            const parentAddress = await userWalletService.getParentAddress();
+            if (!parentAddress) {
+              throw new Error('Parent address not found');
+            }
+            await userWalletService.setCurrentAccount(
+              parentAddress,
+              parentAddress as WalletAddress
+            );
+          }
+        } catch (error) {
+          console.error('Error validating or setting current address:', error);
+        }
+
+        // Extract transaction details from request
+        const { payload } = msg;
+
+        // Get origin from sender for security
+        const origin = new URL(sender.tab?.url || '').origin;
+
+        // Convert Rift transaction to FCL-compatible format
+        const fclCompatibleData = convertRiftToFCL({
+          payload,
+          tabId,
+          origin,
+          sender,
+        });
+
+        // Open the approval popup
+        notificationService
+          .requestApproval(
+            {
+              params: fclCompatibleData,
+              approvalComponent: 'Confirmation',
+            },
+            { height: 700 }
+          )
+          .then(async (response) => {
+            // Handle response from user
+            if (response === 'rejected' || !response) {
+              // User rejected the transaction
+              sendResponse({
+                error: 'Transaction rejected by user',
+                code: 'user_rejected',
+                status: 'error',
+              });
+              return;
+            }
+
+            try {
+              // If we have a txId from the response, use it
+              if (response.txId) {
+                // Listen for transaction completion
+                walletController.listenTransaction(response.txId, true);
+
+                // Send response back to the content script
+                sendResponse({
+                  txId: response.txId,
+                  status: 'success',
+                });
+              }
+              // If we have an approved response from the modified Confirmation component
+              else if (response.approved && response.transaction) {
+                // Store the refBlock ID if provided (for transaction tracking)
+                if (response.refBlock) {
+                  await sessionStorage.setItem('pendingRefBlockId', response.refBlock);
+                }
+
+                // Execute the transaction now that it's been approved by the user
+                const txId = await walletController.sendTransaction(
+                  response.transaction,
+                  response.args || []
+                );
+
+                // Listen for transaction completion
+                walletController.listenTransaction(txId, true);
+
+                // Send response back to the content script
+                sendResponse({
+                  txId,
+                  status: 'success',
+                });
+              } else {
+                // Execute the transaction if we don't have a txId
+                const txId = await walletController.sendTransaction(
+                  payload.cadence,
+                  payload.args || []
+                );
+
+                // Listen for transaction completion
+                walletController.listenTransaction(txId, true);
+
+                // Send response back to the content script
+                sendResponse({
+                  txId,
+                  status: 'success',
+                });
+              }
+            } catch (error) {
+              console.error('Error processing Rift transaction:', error);
+              sendResponse({
+                error: error.message || 'Transaction failed',
+                code: 'unknown_error',
+                status: 'error',
+              });
+            }
+          });
+      });
+
+    return true; // Keep channel open for async response
+  }
+
+  if (msg.type === 'RIFT:GET_ADDRESS') {
+    (async () => {
+      try {
+        const address = await userWalletService.getCurrentAddress();
+        sendResponse({ address: address || null });
+      } catch (error) {
+        console.error('Error getting address for Rift:', error);
+        sendResponse({ error: 'Failed to get wallet address' });
+      }
+    })();
+    return true; // Keep channel open for async response
+  }
+
+  if (msg.type === 'RIFT:GET_NETWORK') {
+    (async () => {
+      try {
+        const network = await userWalletService.getNetwork();
+        sendResponse({ network: network || 'mainnet' });
+      } catch (error) {
+        console.error('Error getting network for Rift:', error);
+        sendResponse({ error: 'Failed to get wallet network' });
+      }
+    })();
+    return true; // Keep channel open for async response
+  }
+
   // Launches extension popup window
   if (
     service?.endpoint &&
@@ -478,3 +675,50 @@ const SAVE_TIMESTAMP_INTERVAL_MS = 2 * 1000;
 
 saveTimestamp();
 setInterval(saveTimestamp, SAVE_TIMESTAMP_INTERVAL_MS);
+
+// Function to convert Rift transaction data to FCL compatible format
+function convertRiftToFCL({ payload, tabId, origin, sender }) {
+  // Create a synthetic FCL-compatible message body
+  const body = {
+    cadence: payload.cadence,
+    message: '', // Will be set by wallet during signing process
+    addr: '', // Will be filled by wallet
+    keyId: 0, // Will be filled by wallet
+    roles: {
+      proposer: true,
+      authorizer: true,
+      payer: true,
+    },
+    voucher: {
+      refBlock: '', // Will be filled by wallet
+      payloadSigs: [],
+    },
+    f_type: 'Signable',
+  };
+
+  // Create FCL-compatible config structure
+  const config = {
+    client: {
+      hostname: origin,
+      network: payload.network || 'mainnet',
+    },
+    app: {
+      title: payload.title || 'Rift Transaction',
+      icon: payload.icon || sender.tab?.favIconUrl || '',
+    },
+  };
+
+  // Combine into FCL-compatible parameters
+  return {
+    tabId,
+    type: 'authz',
+    rift: true, // Flag to identify it as a Rift transaction
+    icon: sender.tab?.favIconUrl,
+    origin,
+    host: origin,
+    body, // FCL compatible body
+    config, // FCL compatible config
+    arguments: payload.args || [],
+    cadence: payload.cadence,
+  };
+}

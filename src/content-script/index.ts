@@ -2,8 +2,19 @@ import { nanoid } from 'nanoid';
 import { v4 as uuid } from 'uuid';
 
 import { Message } from '@/shared/utils/messaging';
+import { initRiftDetection } from './rift';
 
 const channelName = nanoid();
+
+// Add Rift detection initialization
+// This will run the Rift detection if it's enabled in settings
+setTimeout(() => {
+  try {
+    initRiftDetection();
+  } catch (error) {
+    console.error('Error initializing Rift detection:', error);
+  }
+}, 1000);
 
 const injectProviderScript = async (isDefaultWallet) => {
   // Set local storage variables

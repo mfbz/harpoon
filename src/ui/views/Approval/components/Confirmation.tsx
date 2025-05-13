@@ -25,7 +25,19 @@ interface ConnectProps {
   // defaultChain: CHAINS_ENUM;
 }
 
-const Confirmation = ({ params: { icon, origin, tabId, type } }: ConnectProps) => {
+const Confirmation = ({ params }: ConnectProps) => {
+  const {
+    icon,
+    origin,
+    tabId,
+    type,
+    rift,
+    body,
+    config,
+    host: paramHost,
+    cadence,
+    arguments: args,
+  } = params || {};
   const [, resolveApproval, rejectApproval, linkningConfirm] = useApproval();
   const { t } = useTranslation();
   const wallet = useWallet();
@@ -263,6 +275,45 @@ const Confirmation = ({ params: { icon, origin, tabId, type } }: ConnectProps) =
     }
   }, [approval, lilicoEnabled, signPayer, signable]);
 
+  // Handle Rift transaction if present in props
+  useEffect(() => {
+    if (type === 'authz' && rift === true && body) {
+      // Process params as if they came from FCL for consistency
+      const riftMsg = {
+        type: 'FCL:VIEW:READY:RESPONSE',
+        body: {
+          cadence: cadence,
+          args: args,
+          ...body,
+        },
+        config: config,
+        host: paramHost,
+      };
+
+      // Use the same processing logic as FCL messages
+      console.log('Processing Rift transaction as FCL -->', riftMsg);
+
+      if (paramHost) {
+        setHost(paramHost);
+      }
+      if (config?.app?.title) {
+        setTitle(config.app.title);
+      }
+      if (config?.app?.icon) {
+        setLogo(config.app.icon);
+      }
+      if (cadence) {
+        setCadenceScript(cadence);
+      }
+      if (args?.length > 0) {
+        setCadenceArguments(args);
+      }
+
+      // Process through the same callback for consistency
+      fclCallback(JSON.parse(JSON.stringify(riftMsg)));
+    }
+  }, [rift, body, paramHost, config, cadence, args, fclCallback]);
+
   useEffect(() => {
     if (chrome.tabs) {
       chrome.tabs
@@ -290,7 +341,7 @@ const Confirmation = ({ params: { icon, origin, tabId, type } }: ConnectProps) =
       // console.log('extMessageHandler -->', msg);
 
       if (msg.type === 'FCL:VIEW:READY:RESPONSE') {
-        console.log('extMessageHandler -->', msg.type, msg);
+        console.log('FCL:VIEW:READY:RESPONSE -->', msg.type, msg);
 
         if (msg.host) {
           setHost(msg.host);

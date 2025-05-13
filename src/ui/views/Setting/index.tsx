@@ -30,6 +30,7 @@ import IconEnd from '../../../components/iconfont/IconAVector11Stroke';
 import IconBackup from '../../../components/iconfont/IconBackup';
 import IconDeveloper from '../../../components/iconfont/IconDeveloper';
 import IconLock from '../../../components/iconfont/IconLock';
+import IconRift from '../../../components/iconfont/IconRift';
 // Feature flags
 const SHOW_DEVICES = false;
 
@@ -314,6 +315,28 @@ const SettingTab = () => {
                 </Box>
               </ListItemIcon>
               <ListItemText primary={chrome.i18n.getMessage('Developer__Mode')} />
+              <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
+                <IconEnd size={12} />
+              </ListItemIcon>
+            </ListItemButton>
+          </ListItem>
+
+          <Divider sx={{ width: '90%' }} variant="middle" />
+
+          <ListItem
+            button
+            component={Link}
+            to="/dashboard/setting/riftSettings"
+            disablePadding
+            className={classes.listItem}
+          >
+            <ListItemButton className={classes.itemButton}>
+              <ListItemIcon sx={{ minWidth: '25px' }}>
+                <Box className={classes.iconContainer}>
+                  <IconRift size={18} color="#59A1DB" />
+                </Box>
+              </ListItemIcon>
+              <ListItemText primary={chrome.i18n.getMessage('Rift_Frames')} />
               <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
                 <IconEnd size={12} />
               </ListItemIcon>
