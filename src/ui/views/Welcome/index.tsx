@@ -4,6 +4,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import appicon from '@/ui/FRWAssets/image/app-icon.png';
+import welcomeBackground from '@/ui/FRWAssets/image/welcome-background.png';
 import create from '@/ui/FRWAssets/svg/create.svg';
 import importPng from '@/ui/FRWAssets/svg/import.svg';
 import qr from '@/ui/FRWAssets/svg/scanIcon.svg';
@@ -19,6 +20,10 @@ const Welcome = () => {
         height: '100vh',
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundImage: `url(${welcomeBackground})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
       }}
     >
       <RegisterHeader />
