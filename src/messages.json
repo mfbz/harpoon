@@ -1487,5 +1487,11 @@
   },
   "Rift_Frames_Description": {
     "message": "Enable or disable Rift Frames integration"
+  },
+  "Rift_HTTP_Dev_Mode": {
+    "message": "HTTP Development Mode"
+  },
+  "Rift_HTTP_Dev_Mode_Description": {
+    "message": "Use HTTP instead of HTTPS for localhost development with Rift frames"
   }
 }

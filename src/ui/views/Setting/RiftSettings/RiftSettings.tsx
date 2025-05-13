@@ -3,6 +3,7 @@ import { Box, Typography, Fade } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { styled } from '@mui/system';
 import React, { useState, useEffect, useCallback } from 'react';
+import { setConfig } from 'rift-js';
 
 import { storage } from '@/background/webapi';
 import { LLHeader } from '@/ui/FRWComponent';
@@ -105,18 +106,30 @@ const RiftSettings = () => {
   const usewallet = useWallet();
   const classes = useStyles();
   const [riftFramesEnabled, setRiftFramesEnabled] = useState(false);
+  const [httpDevelopmentMode, setHttpDevelopmentMode] = useState(false);
 
   const loadSettings = useCallback(async () => {
     const riftEnabled = await storage.get('riftFramesEnabled');
-    return { riftEnabled: riftEnabled === true };
+    const httpDevMode = await storage.get('riftHttpDevelopmentMode');
+    return {
+      riftEnabled: riftEnabled === true,
+      httpDevMode: httpDevMode === true,
+    };
   }, []);
 
   useEffect(() => {
     let mounted = true;
 
-    loadSettings().then(({ riftEnabled }) => {
+    loadSettings().then(({ riftEnabled, httpDevMode }) => {
       if (!mounted) return;
       setRiftFramesEnabled(riftEnabled);
+      setHttpDevelopmentMode(httpDevMode);
+
+      // Initialize rift-js configuration based on stored settings
+      setConfig({
+        useHttpForLocalDevelopment: httpDevMode === true,
+        localHosts: ['localhost', '127.0.0.1'],
+      });
     });
 
     return () => {
@@ -128,6 +141,21 @@ const RiftSettings = () => {
     setRiftFramesEnabled((prev) => {
       const newState = !prev;
       storage.set('riftFramesEnabled', newState);
+      return newState;
+    });
+  };
+
+  const toggleHttpDevelopmentMode = async () => {
+    setHttpDevelopmentMode((prev) => {
+      const newState = !prev;
+      storage.set('riftHttpDevelopmentMode', newState);
+
+      // Update the rift-js configuration immediately
+      setConfig({
+        useHttpForLocalDevelopment: newState,
+        localHosts: ['localhost', '127.0.0.1'],
+      });
+
       return newState;
     });
   };
@@ -156,6 +184,30 @@ const RiftSettings = () => {
           }}
           onChange={() => {
             toggleRiftFrames();
+          }}
+        />
+      </Box>
+
+      <Box className={classes.riftBox} sx={{ marginTop: '12px' }}>
+        <Box>
+          <Typography variant="body1" color="neutral.contrastText" style={{ weight: 600 }}>
+            {chrome.i18n.getMessage('Rift_HTTP_Dev_Mode')}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="neutral.contrastText"
+            className={classes.descriptionText}
+          >
+            {chrome.i18n.getMessage('Rift_HTTP_Dev_Mode_Description')}
+          </Typography>
+        </Box>
+        <Switch
+          checked={httpDevelopmentMode}
+          slots={{
+            root: Root,
+          }}
+          onChange={() => {
+            toggleHttpDevelopmentMode();
           }}
         />
       </Box>

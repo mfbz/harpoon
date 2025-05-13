@@ -6,6 +6,7 @@ import {
   RiftHandshakeMessage,
   RiftIntentMessage,
   wallet,
+  setConfig,
 } from 'rift-js';
 import { storage } from '../background/webapi';
 
@@ -13,6 +14,12 @@ import { storage } from '../background/webapi';
 async function isRiftFramesEnabled(): Promise<boolean> {
   const riftEnabled = await storage.get('riftFramesEnabled');
   return riftEnabled === true;
+}
+
+// Check if HTTP development mode is enabled in settings
+async function isHttpDevelopmentModeEnabled(): Promise<boolean> {
+  const httpDevMode = await storage.get('riftHttpDevelopmentMode');
+  return httpDevMode === true;
 }
 
 // Check if user has already approved this domain
@@ -28,6 +35,16 @@ async function approveDomain(domain: string): Promise<void> {
     approvedDomains.push(domain);
     await storage.set('riftApprovedDomains', approvedDomains);
   }
+}
+
+// Convert a rift:// URL to http:// or https:// based on development mode settings
+function convertRiftUrl(riftUrl: string, useHttp: boolean = false): string {
+  // Check if the URL is for localhost or 127.0.0.1 and if we should use HTTP
+  const isLocalhost = riftUrl.includes('localhost') || riftUrl.includes('127.0.0.1');
+  const protocol = useHttp && isLocalhost ? 'http://' : 'https://';
+
+  // Replace the rift:// scheme with the appropriate protocol
+  return riftUrl.replace(RIFT_URI_SCHEME, protocol);
 }
 
 // Ask user for permission to inject Rift frame
@@ -83,12 +100,32 @@ export async function initRiftDetection(): Promise<void> {
     return;
   }
 
-  // Create a detector and injector from rift-js
+  // Check if HTTP development mode is enabled
+  const httpDevMode = await isHttpDevelopmentModeEnabled();
+
+  // Configure rift-js to use HTTP for local development if enabled
+  if (httpDevMode) {
+    // Use the setConfig function to configure HTTP for local development
+    setConfig({
+      useHttpForLocalDevelopment: true,
+      localHosts: ['localhost', '127.0.0.1'],
+    });
+  } else {
+    // Reset to default behavior (HTTPS only)
+    setConfig({
+      useHttpForLocalDevelopment: false,
+    });
+  }
+
+  // Create a detector from rift-js
   const detector = new wallet.detector.RiftDetector({
     onRiftLinkFound: async (linkElement, riftUrl) => {
       try {
-        // Parse domain from rift URL
-        const url = new URL(riftUrl.replace(RIFT_URI_SCHEME, 'https://'));
+        // Convert the rift URL to HTTPS (or HTTP for localhost when dev mode is on)
+        const convertedUrl = convertRiftUrl(riftUrl, httpDevMode);
+
+        // Parse domain from the URL
+        const url = new URL(convertedUrl);
         const domain = url.hostname;
 
         // Check if domain is already approved
@@ -112,7 +149,7 @@ export async function initRiftDetection(): Promise<void> {
           },
         });
 
-        // Inject the iframe
+        // Inject the iframe, injector will set correct url based on config
         injector.injectFrame(linkElement, riftUrl);
       } catch (error) {
         console.error('Error injecting Rift frame:', error);
