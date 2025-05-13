@@ -128,7 +128,6 @@ const RiftSettings = () => {
       // Initialize rift-js configuration based on stored settings
       setConfig({
         useHttpForLocalDevelopment: httpDevMode === true,
-        localHosts: ['localhost', '127.0.0.1'],
       });
     });
 
@@ -153,7 +152,6 @@ const RiftSettings = () => {
       // Update the rift-js configuration immediately
       setConfig({
         useHttpForLocalDevelopment: newState,
-        localHosts: ['localhost', '127.0.0.1'],
       });
 
       return newState;

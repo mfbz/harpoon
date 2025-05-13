@@ -45,9 +45,7 @@ async function approveDomain(domain: string): Promise<void> {
 
 // Convert a rift:// URL to http:// or https:// based on development mode settings
 function convertRiftUrl(riftUrl: string, useHttp: boolean = false): string {
-  // Check if the URL is for localhost or 127.0.0.1 and if we should use HTTP
-  const isLocalhost = riftUrl.includes('localhost') || riftUrl.includes('127.0.0.1');
-  const protocol = useHttp && isLocalhost ? 'http://' : 'https://';
+  const protocol = useHttp ? 'http://' : 'https://';
 
   // Replace the rift:// scheme with the appropriate protocol
   return riftUrl.replace(RIFT_URI_SCHEME, protocol);
@@ -121,13 +119,13 @@ export async function initRiftDetection(): Promise<void> {
 
   // Check if HTTP development mode is enabled
   const httpDevMode = await isHttpDevelopmentModeEnabled();
+  console.log('httpDevMode', httpDevMode);
 
   // Configure rift-js to use HTTP for local development if enabled
   if (httpDevMode) {
     // Use the setConfig function to configure HTTP for local development
     setConfig({
       useHttpForLocalDevelopment: true,
-      localHosts: ['localhost', '127.0.0.1'],
     });
   } else {
     // Reset to default behavior (HTTPS only)
@@ -150,6 +148,7 @@ export async function initRiftDetection(): Promise<void> {
 
         // Convert the rift URL to HTTPS (or HTTP for localhost when dev mode is on)
         const convertedUrl = convertRiftUrl(riftUrl, httpDevMode);
+        console.log('convertedUrl', convertedUrl);
 
         // Parse domain from the URL
         const url = new URL(convertedUrl);
