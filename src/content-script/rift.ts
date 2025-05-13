@@ -8,7 +8,13 @@ import {
   wallet,
   setConfig,
 } from 'rift-js';
-import { storage } from '../background/webapi';
+import storage from '../shared/utils/storage';
+
+// Track which Rift URLs have already been processed to avoid duplicate prompts
+const processedRiftUrls = new Map<string, boolean>();
+
+// Track if a prompt is currently being shown to prevent multiple prompts
+let isPromptActive = false;
 
 // Check if Rift Frames are enabled in settings
 async function isRiftFramesEnabled(): Promise<boolean> {
@@ -50,15 +56,23 @@ function convertRiftUrl(riftUrl: string, useHttp: boolean = false): string {
 // Ask user for permission to inject Rift frame
 function promptForRiftInjection(domain: string): Promise<boolean> {
   return new Promise((resolve) => {
+    // Prevent multiple prompts from being shown simultaneously
+    if (isPromptActive) {
+      console.warn('A Rift injection prompt is already active');
+      resolve(false);
+      return;
+    }
+
+    isPromptActive = true;
+
     // Create prompt UI
     const promptDiv = document.createElement('div');
     promptDiv.style.position = 'fixed';
-    promptDiv.style.bottom = '20px';
-    promptDiv.style.right = '20px';
+    promptDiv.style.bottom = '24px';
+    promptDiv.style.right = '24px';
     promptDiv.style.backgroundColor = '#1E1E1E';
     promptDiv.style.borderRadius = '12px';
     promptDiv.style.padding = '16px';
-    promptDiv.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
     promptDiv.style.zIndex = '9999';
     promptDiv.style.color = 'white';
     promptDiv.style.fontFamily = 'Inter, -apple-system, BlinkMacSystemFont, sans-serif';
@@ -79,15 +93,20 @@ function promptForRiftInjection(domain: string): Promise<boolean> {
 
     document.body.appendChild(promptDiv);
 
+    // Function to clean up and resolve
+    const finishPrompt = (approved: boolean) => {
+      promptDiv.remove();
+      isPromptActive = false;
+      resolve(approved);
+    };
+
     // Add event listeners
     document.getElementById('rift-deny')?.addEventListener('click', () => {
-      promptDiv.remove();
-      resolve(false);
+      finishPrompt(false);
     });
 
     document.getElementById('rift-approve')?.addEventListener('click', () => {
-      promptDiv.remove();
-      resolve(true);
+      finishPrompt(true);
     });
   });
 }
@@ -121,6 +140,14 @@ export async function initRiftDetection(): Promise<void> {
   const detector = new wallet.detector.RiftDetector({
     onRiftLinkFound: async (linkElement, riftUrl) => {
       try {
+        // Skip if this URL has already been processed
+        if (processedRiftUrls.has(riftUrl)) {
+          return;
+        }
+
+        // Mark this URL as being processed
+        processedRiftUrls.set(riftUrl, true);
+
         // Convert the rift URL to HTTPS (or HTTP for localhost when dev mode is on)
         const convertedUrl = convertRiftUrl(riftUrl, httpDevMode);
 
@@ -134,6 +161,8 @@ export async function initRiftDetection(): Promise<void> {
           // Prompt user for approval
           const userApproved = await promptForRiftInjection(domain);
           if (!userApproved) {
+            // If not approved, remove from processed list to allow future prompts
+            processedRiftUrls.delete(riftUrl);
             return;
           }
 
@@ -152,6 +181,8 @@ export async function initRiftDetection(): Promise<void> {
         // Inject the iframe, injector will set correct url based on config
         injector.injectFrame(linkElement, riftUrl);
       } catch (error) {
+        // Clean up in case of error
+        processedRiftUrls.delete(riftUrl);
         console.error('Error injecting Rift frame:', error);
       }
     },
@@ -351,8 +382,3 @@ async function handleIntent(iframe: HTMLIFrameElement, message: RiftIntentMessag
     );
   }
 }
-
-// Run the rift detection when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-  initRiftDetection();
-});

@@ -5,7 +5,7 @@ import { styled } from '@mui/system';
 import React, { useState, useEffect, useCallback } from 'react';
 import { setConfig } from 'rift-js';
 
-import { storage } from '@/background/webapi';
+import storage from '@/shared/utils/storage';
 import { LLHeader } from '@/ui/FRWComponent';
 import { useWallet } from 'ui/utils';
 
