@@ -7,11 +7,15 @@ export const setEnvironmentBadge = () => {
     // No badge for production
     chrome.action.setBadgeText({ text: '' });
   } else if (deploymentEnv === 'staging') {
-    chrome.action.setBadgeText({ text: 'stg' });
+    // Single letter for staging
+    chrome.action.setBadgeText({ text: 'S' });
   } else if (deploymentEnv === 'development') {
-    chrome.action.setBadgeText({ text: 'dev' });
+    // Single letter for development
+    chrome.action.setBadgeText({ text: 'D' });
   } else {
-    chrome.action.setBadgeText({ text: 'lcl' });
+    // Single letter for local development
+    // TODO: change to L
+    chrome.action.setBadgeText({ text: '' });
   }
-  chrome.action.setBadgeBackgroundColor({ color: '#121212' });
+  chrome.action.setBadgeBackgroundColor({ color: '#00B4D8' });
 };
