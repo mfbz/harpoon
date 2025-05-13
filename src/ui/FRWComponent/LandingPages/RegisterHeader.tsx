@@ -24,7 +24,7 @@ const RegisterHeader = ({ showAppButton = false }: RegisterHeaderProps) => {
             variant="text"
             sx={{
               color: '#F9F9F9',
-              backgroundColor: '#404040',
+              backgroundColor: '#02033B',
               px: '16px',
               py: '8px',
               borderRadius: '12px',
@@ -45,7 +45,7 @@ const RegisterHeader = ({ showAppButton = false }: RegisterHeaderProps) => {
           variant="text"
           sx={{
             color: '#F9F9F9',
-            backgroundColor: '#404040',
+            backgroundColor: '#02033B',
             px: '16px',
             py: '8px',
             borderRadius: '12px',

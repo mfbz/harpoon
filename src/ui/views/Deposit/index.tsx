@@ -215,7 +215,7 @@ const Deposit = () => {
               sx={{
                 marginY: '30px',
                 padding: '16px',
-                backgroundColor: '#222',
+                backgroundColor: '#03045e',
                 borderRadius: '12px',
               }}
             >

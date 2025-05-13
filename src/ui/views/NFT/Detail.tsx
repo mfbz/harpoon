@@ -259,7 +259,7 @@ const Detail = () => {
         ) : (
           <div
             style={{
-              background: '#222222',
+              background: '#03045e',
               height: '100%',
               width: '100%',
               borderRadius: '8px',

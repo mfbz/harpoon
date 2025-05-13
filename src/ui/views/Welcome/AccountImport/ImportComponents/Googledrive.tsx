@@ -82,7 +82,10 @@ const Googledrive = ({ setErrorMessage, setShowError, handleGoogleAccountsFound 
           onClick={getGoogle}
           startIcon={loading && <LLSpinner size={20} />}
         >
-          <Typography variant="body1" sx={{ color: '#222', fontSize: '20px', fontWeight: '600' }}>
+          <Typography
+            variant="body1"
+            sx={{ color: '#03045e', fontSize: '20px', fontWeight: '600' }}
+          >
             {chrome.i18n.getMessage('Connect')}
           </Typography>
         </Button>

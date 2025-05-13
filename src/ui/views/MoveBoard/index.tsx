@@ -94,7 +94,7 @@ const MoveBoard = (props: MoveBoardProps) => {
         sx: {
           width: '100%',
           height: 'auto',
-          background: '#222',
+          background: '#03045e',
           borderRadius: '18px 18px 0px 0px',
         },
       }}

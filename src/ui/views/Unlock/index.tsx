@@ -32,7 +32,7 @@ const useStyles = makeStyles(() => ({
     boxSizing: 'border-box',
     '&.Mui-focused': {
       border: '2px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
+      boxShadow: 'none',
     },
   },
 }));

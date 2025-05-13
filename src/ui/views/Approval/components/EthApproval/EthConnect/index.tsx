@@ -242,7 +242,7 @@ const EthConnect = ({ params: { icon, name, origin } }: ConnectProps) => {
                 sx={{
                   borderRadius: '8px',
                   padding: '12px 16px',
-                  backgroundColor: '#222222',
+                  backgroundColor: '#03045e',
                   flex: '1',
                 }}
               >
@@ -270,7 +270,7 @@ const EthConnect = ({ params: { icon, name, origin } }: ConnectProps) => {
                 sx={{
                   borderRadius: '8px',
                   padding: '12px 16px',
-                  backgroundColor: '#222222',
+                  backgroundColor: '#03045e',
                   flex: '1',
                 }}
               >

@@ -26,8 +26,8 @@ const useStyles = makeStyles(() => ({
     height: '100%',
     borderRadius: '8px',
     '&:hover': {
-      color: '#222222',
-      backgroundColor: '#222222',
+      color: '#03045e',
+      backgroundColor: '#03045e',
     },
   },
   card: {
@@ -39,8 +39,8 @@ const useStyles = makeStyles(() => ({
     padding: '8px',
     display: 'inline-block',
     '&:hover': {
-      color: '#222222',
-      backgroundColor: '#222222',
+      color: '#03045e',
+      backgroundColor: '#03045e',
     },
   },
   grid: {
@@ -168,7 +168,7 @@ const GridView = (props: GridViewProps) => {
         ) : (
           <div
             style={{
-              background: '#222222',
+              background: '#03045e',
               height: '100%',
               width: '100%',
               borderRadius: '8px',

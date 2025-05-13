@@ -53,7 +53,7 @@ const MoveCollectionSelect = ({
         sx: {
           width: '100%',
           height: '479px',
-          background: '#222',
+          background: '#03045e',
           borderRadius: '18px 18px 0px 0px',
         },
       }}

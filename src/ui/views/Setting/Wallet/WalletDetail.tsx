@@ -44,7 +44,7 @@ const useStyles = makeStyles(() => ({
     position: 'sticky',
     top: 0,
     // width: '100%',
-    backgroundColor: '#121212',
+    backgroundColor: '#03045E',
     margin: 0,
     padding: 0,
   },
@@ -58,7 +58,7 @@ const useStyles = makeStyles(() => ({
     width: '90%',
     // height: '67px',
     margin: '10px auto',
-    backgroundColor: '#282828',
+    backgroundColor: '#02033B',
     padding: '20px 24px',
     display: 'flex',
     flexDirection: 'row',
@@ -69,7 +69,7 @@ const useStyles = makeStyles(() => ({
   radioBox: {
     width: '90%',
     borderRadius: '16px',
-    backgroundColor: '#282828',
+    backgroundColor: '#02033B',
     margin: '20px auto',
     // padding: '10px 24px',
   },
@@ -84,7 +84,7 @@ const useStyles = makeStyles(() => ({
     height: '66px',
     width: '100%',
     '&:hover': {
-      backgroundColor: '#282828',
+      backgroundColor: '#02033B',
     },
   },
   itemButton: {
@@ -92,7 +92,7 @@ const useStyles = makeStyles(() => ({
     height: '100%',
     margin: '0 auto',
     '&:hover': {
-      backgroundColor: '#282828',
+      backgroundColor: '#02033B',
     },
   },
   list: {
@@ -100,9 +100,9 @@ const useStyles = makeStyles(() => ({
     borderRadius: '16px',
     padding: '0 10px',
     overflow: 'hidden',
-    backgroundColor: '#282828',
+    backgroundColor: '#02033B',
     '&:hover': {
-      backgroundColor: '#282828',
+      backgroundColor: '#02033B',
     },
   },
   noBorder: {
@@ -113,9 +113,9 @@ const useStyles = makeStyles(() => ({
     borderRadius: '16px',
     padding: '20px',
     margin: '20px auto',
-    backgroundColor: '#282828',
+    backgroundColor: '#02033B',
     '&:hover': {
-      backgroundColor: '#282828',
+      backgroundColor: '#02033B',
     },
     display: 'flex',
     flexDirection: 'row',
@@ -124,7 +124,7 @@ const useStyles = makeStyles(() => ({
   gasBox: {
     // width: '90%',
     margin: '10px auto',
-    backgroundColor: '#282828',
+    backgroundColor: '#02033B',
     padding: '20px 24px',
     display: 'flex',
     flexDirection: 'row',
@@ -183,7 +183,7 @@ const Root = styled('span')(
 
     &.${switchClasses.focusVisible} .${switchClasses.thumb} {
       background-color: ${grey[500]};
-      box-shadow: 0 0 1px 8px rgba(0, 0, 0, 0.25);
+      box-shadow: none;
     }
 
     &.${switchClasses.checked} {

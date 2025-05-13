@@ -122,7 +122,7 @@ const Reset = () => {
             sx={{
               display: 'flex',
               // height: '56px',
-              // backgroundColor: '#404040',
+              // backgroundColor: '#02033B',
               padding: '24px 24px 0px 24px',
             }}
           >

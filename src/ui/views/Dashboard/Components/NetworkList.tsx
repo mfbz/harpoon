@@ -144,7 +144,7 @@ const NetworkList = ({ networkColor, currentNetwork, onClose }: NetworkListProps
           MenuProps={{
             PaperProps: {
               sx: {
-                backgroundColor: '#222222',
+                backgroundColor: '#03045e',
                 borderRadius: '8px',
                 marginTop: '4px',
                 zIndex: 2000,

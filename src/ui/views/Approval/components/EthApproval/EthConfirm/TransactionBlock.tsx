@@ -202,7 +202,7 @@ export const TransactionBlock = ({ title, data, logo, lilicoEnabled, decodedCall
                 <Box
                   sx={{
                     borderRadius: '12px',
-                    background: '#222',
+                    background: '#03045e',
                     display: 'flex',
                     width: '100%',
                     padding: '16px',
@@ -288,7 +288,7 @@ export const TransactionBlock = ({ title, data, logo, lilicoEnabled, decodedCall
                 <Box
                   sx={{
                     borderRadius: '12px',
-                    background: '#222',
+                    background: '#03045e',
                     display: 'flex',
                     width: '100%',
                     padding: '16px',
@@ -349,7 +349,7 @@ export const TransactionBlock = ({ title, data, logo, lilicoEnabled, decodedCall
             <Box
               sx={{
                 borderRadius: '12px',
-                background: '#222',
+                background: '#03045e',
                 display: 'flex',
                 width: '100%',
                 padding: '16px',

@@ -39,7 +39,7 @@ const Forgot = () => {
               flexDirection: 'column',
               alignItems: 'center',
               padding: '40px',
-              backgroundColor: '#222',
+              backgroundColor: '#03045e',
               width: '720px',
               position: 'relative',
               borderRadius: '24px',

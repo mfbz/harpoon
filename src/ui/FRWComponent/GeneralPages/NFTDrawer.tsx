@@ -56,7 +56,7 @@ export const NFTMoveDrawer: React.FC<NFTMoveDrawerProps> = ({
       transitionDuration={300}
       open={showMoveBoard}
       PaperProps={{
-        sx: { width: '100%', height: 'calc(100% - 56px)', background: '#222' },
+        sx: { width: '100%', height: 'calc(100% - 56px)', background: '#03045e' },
       }}
     >
       {/* Header */}

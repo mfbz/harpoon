@@ -42,7 +42,7 @@ const LandingComponents = ({
         height: 'auto',
         transition: 'all .3s ease-in-out',
         borderRadius: '24px',
-        boxShadow: '0px 24px 24px rgba(0,0,0,0.36)',
+        boxShadow: 'none',
         overflowY: 'auto',
         overflowX: 'hidden',
         backgroundColor: 'background.paper',

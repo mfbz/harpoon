@@ -103,7 +103,7 @@ const TokenDetail = () => {
               position: 'absolute',
               top: '100%',
               right: 0,
-              bgcolor: '#222222',
+              bgcolor: '#03045e',
               color: '#FFFFFF',
               borderRadius: '8px',
               boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',

@@ -22,7 +22,7 @@ export const CustomDialog = ({ sx, PaperProps, ...props }: CustomDialogProps) =>
           borderRadius: '24px',
           height: 'auto',
           padding: '40px',
-          backgroundColor: '#222222',
+          backgroundColor: '#03045e',
           backgroundImage: 'none',
           ...PaperProps?.sx, // Allow Paper sx override
         },

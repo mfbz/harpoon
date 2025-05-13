@@ -268,7 +268,7 @@ const Connect = ({ params: { /*icon, origin,*/ tabId } }: ConnectProps) => {
             flexDirection: 'column',
             borderRadius: '12px',
             height: '100%',
-            background: 'linear-gradient(0deg, #121212, #11271D)',
+            background: '#03045E',
           }}
         >
           <Box sx={{ display: 'flex', flexDirection: 'column', margin: '18px', gap: '18px' }}>
@@ -323,7 +323,7 @@ const Connect = ({ params: { /*icon, origin,*/ tabId } }: ConnectProps) => {
               sx={{
                 borderRadius: '8px',
                 padding: '12px 16px',
-                backgroundColor: '#222222',
+                backgroundColor: '#03045e',
                 flex: '1',
               }}
             >
@@ -351,7 +351,7 @@ const Connect = ({ params: { /*icon, origin,*/ tabId } }: ConnectProps) => {
               sx={{
                 borderRadius: '8px',
                 padding: '12px 16px',
-                backgroundColor: '#222222',
+                backgroundColor: '#03045e',
                 flex: '1',
               }}
             >
@@ -408,7 +408,7 @@ const Connect = ({ params: { /*icon, origin,*/ tabId } }: ConnectProps) => {
             flexDirection: 'column',
             borderRadius: '12px',
             height: '506px',
-            background: 'linear-gradient(0deg, #121212, #11271D)',
+            background: '#03045E',
           }}
         >
           <Box sx={{ display: 'flex', flexDirection: 'column', margin: '18px', gap: '18px' }}>

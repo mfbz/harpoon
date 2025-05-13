@@ -23,6 +23,54 @@ const themeOptions: ThemeOptions = {
         // ... other global classes or element selectors
       },
     },
+    // Add overrides for components to remove shadows and make design flat
+    MuiPaper: {
+      defaultProps: {
+        elevation: 0,
+      },
+      styleOverrides: {
+        root: {
+          boxShadow: 'none',
+        },
+      },
+    },
+    MuiAppBar: {
+      defaultProps: {
+        elevation: 0,
+      },
+      styleOverrides: {
+        root: {
+          boxShadow: 'none',
+        },
+      },
+    },
+    MuiCard: {
+      defaultProps: {
+        elevation: 0,
+      },
+      styleOverrides: {
+        root: {
+          boxShadow: 'none',
+        },
+      },
+    },
+    MuiButton: {
+      defaultProps: {
+        disableElevation: true,
+      },
+      styleOverrides: {
+        root: {
+          boxShadow: 'none',
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          boxShadow: 'none',
+        },
+      },
+    },
   },
   palette: {
     mode: 'dark',
@@ -55,8 +103,8 @@ const themeOptions: ThemeOptions = {
       light: '#E5404029',
     },
     background: {
-      default: '#121212',
-      paper: '#282828',
+      default: '#03045E',
+      paper: '#02033B',
     },
     primary: {
       // light: will be calculated from palette.primary.main,
@@ -77,15 +125,15 @@ const themeOptions: ThemeOptions = {
       contrastText: '#F9F9F9',
     },
     info3: {
-      main: '#333333',
-      dark: '#222222',
+      main: '#02033B',
+      dark: '#03045e',
       contrastText: '#FFFFFF',
     },
     yellow: {
       main: '#F3EA5F',
     },
     neutral: {
-      main: '#282828',
+      main: '#02033B',
       text: '#8C9BAB',
       light: '#343535',
       contrastText: '#FFFFFF',

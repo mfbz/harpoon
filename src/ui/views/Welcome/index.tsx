@@ -3,7 +3,7 @@ import { Box } from '@mui/system';
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-import appicon from '@/ui/FRWAssets/image/appicon.png';
+import appicon from '@/ui/FRWAssets/image/app-icon.png';
 import create from '@/ui/FRWAssets/svg/create.svg';
 import importPng from '@/ui/FRWAssets/svg/import.svg';
 import qr from '@/ui/FRWAssets/svg/scanIcon.svg';
@@ -39,22 +39,22 @@ const Welcome = () => {
             justifyContent: 'space-between',
             alignItems: 'flex-end',
             px: '60px',
-            backgroundColor: '#222',
+            backgroundColor: '#009DD5',
             height: '380px',
             width: '625px',
             position: 'relative',
-            borderRadius: '24px',
+            borderRadius: '80px',
           }}
         >
           <img
             src={appicon}
             style={{
-              borderRadius: '24px',
               margin: '0',
-              width: '368px',
+              width: '256px',
+              height: '256px',
               position: 'absolute',
-              right: '0px',
-              top: '0px',
+              right: '24px',
+              top: '24px',
             }}
           />
 
@@ -113,6 +113,7 @@ const Welcome = () => {
                 textTransform: 'capitalize',
                 marginBottom: '16px',
                 paddingLeft: '32px',
+                background: '#FFFFFF',
               }}
             >
               <CardMedia
