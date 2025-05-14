@@ -388,17 +388,103 @@ const extMessageHandler = (msg, sender, sendResponse) => {
 
   // Handle Rift protocol messages
   if (msg.type === 'RIFT:GET_CONTEXT') {
+    console.log('Background: Received RIFT:GET_CONTEXT request', msg);
+    const messageId = msg.messageId; // Extract the message ID
+
     (async () => {
       try {
-        const address = await userWalletService.getCurrentAddress();
-        const network = await userWalletService.getNetwork();
-        sendResponse({
+        console.log('Debug: Before getCurrentAddress - appStoreLoaded:', appStoreLoaded);
+        console.log('Debug: Is wallet locked:', !keyringService.isUnlocked());
+
+        // Use a try-catch since getCurrentPubkey will throw if there's an issue
+        let currentPubkeySet = false;
+        try {
+          const pubkey = userWalletService.getCurrentPubkey();
+          currentPubkeySet = !!pubkey;
+          console.log('Debug: Current pubkey set:', currentPubkeySet);
+        } catch (pubkeyError) {
+          console.error('Debug: Error checking pubkey:', pubkeyError);
+        }
+
+        let address;
+        try {
+          address = await userWalletService.getCurrentAddress();
+          console.log('Debug: Successfully got address:', address);
+        } catch (addressError) {
+          console.error('Debug: Error getting address:', addressError);
+          address = null;
+        }
+
+        let network;
+        try {
+          network = await userWalletService.getNetwork();
+          console.log('Debug: Successfully got network:', network);
+        } catch (networkError) {
+          console.error('Debug: Error getting network:', networkError);
+          network = null;
+        }
+
+        console.log('Background: Sending RIFT context response with address:', address);
+        // Ensure we're providing non-null values and that the response is properly structured
+        const responseData = {
           address: address || null,
-          network: network || 'mainnet',
-        });
+          network: network || null,
+        };
+
+        // Prepare the response with the message ID
+        const responseWithId = {
+          responseId: messageId,
+          data: responseData,
+        };
+
+        console.log('Debug: Sending response object:', JSON.stringify(responseData));
+        console.log('Debug: Response with ID:', responseWithId);
+
+        if (messageId) {
+          // If we have a message ID, use the new response format
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0]?.id) {
+              chrome.tabs.sendMessage(tabs[0].id, responseWithId);
+              console.log(`Sent response to tab ${tabs[0].id} with ID ${messageId}`);
+            } else {
+              console.error('Could not find active tab to send response to');
+              // Fallback to sending directly to sender
+              if (sender?.tab?.id) {
+                chrome.tabs.sendMessage(sender.tab.id, responseWithId);
+                console.log(`Sent response to sender tab ${sender.tab.id} with ID ${messageId}`);
+              } else {
+                console.error('Could not find sender tab to send response to');
+              }
+            }
+          });
+        }
+
+        // Also send via the standard callback mechanism as a fallback
+        sendResponse(responseData);
       } catch (error) {
         console.error('Error getting context for Rift:', error);
-        sendResponse({ error: 'Failed to get wallet context' });
+
+        const errorResponse = { error: 'Failed to get wallet context' };
+
+        if (messageId) {
+          // If we have a message ID, use the new response format for errors too
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0]?.id) {
+              chrome.tabs.sendMessage(tabs[0].id, {
+                responseId: messageId,
+                data: errorResponse,
+              });
+            } else if (sender?.tab?.id) {
+              chrome.tabs.sendMessage(sender.tab.id, {
+                responseId: messageId,
+                data: errorResponse,
+              });
+            }
+          });
+        }
+
+        // Also send via the standard callback mechanism as a fallback
+        sendResponse(errorResponse);
       }
     })();
     return true; // Keep channel open for async response
@@ -406,6 +492,9 @@ const extMessageHandler = (msg, sender, sendResponse) => {
 
   if (msg.type === 'RIFT:EXECUTE_SCRIPT') {
     // Execute script from Rift frame
+    console.log('Background: Received RIFT:EXECUTE_SCRIPT request', msg);
+    const messageId = msg.messageId; // Extract the message ID
+
     (async () => {
       try {
         // Extract script details from request
@@ -417,14 +506,59 @@ const extMessageHandler = (msg, sender, sendResponse) => {
           args: payload.args || [],
         });
 
-        // Send response back to the content script
-        sendResponse({ result });
+        const responseData = { result };
+        console.log('Debug: Script execution result:', responseData);
+
+        // Prepare the response with the message ID if available
+        if (messageId) {
+          const responseWithId = {
+            responseId: messageId,
+            data: responseData,
+          };
+
+          console.log('Debug: Response with ID:', responseWithId);
+
+          // Send response to the active tab
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0]?.id) {
+              chrome.tabs.sendMessage(tabs[0].id, responseWithId);
+              console.log(`Sent script result to tab ${tabs[0].id} with ID ${messageId}`);
+            } else if (sender?.tab?.id) {
+              chrome.tabs.sendMessage(sender.tab.id, responseWithId);
+              console.log(`Sent script result to sender tab ${sender.tab.id} with ID ${messageId}`);
+            }
+          });
+        }
+
+        // Also send via the standard callback mechanism as a fallback
+        sendResponse(responseData);
       } catch (error) {
         console.error('Error executing Rift script:', error);
-        sendResponse({
+
+        const errorResponse = {
           error: error.message || 'Script execution failed',
           status: 'error',
-        });
+        };
+
+        if (messageId) {
+          // Send error response with ID
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0]?.id) {
+              chrome.tabs.sendMessage(tabs[0].id, {
+                responseId: messageId,
+                data: errorResponse,
+              });
+            } else if (sender?.tab?.id) {
+              chrome.tabs.sendMessage(sender.tab.id, {
+                responseId: messageId,
+                data: errorResponse,
+              });
+            }
+          });
+        }
+
+        // Also send via the standard callback mechanism as a fallback
+        sendResponse(errorResponse);
       }
     })();
 
@@ -443,16 +577,44 @@ const extMessageHandler = (msg, sender, sendResponse) => {
 
         // Check if current address is flow address
         try {
-          const currentAddress = await userWalletService.getCurrentAddress();
-          if (!isValidFlowAddress(currentAddress)) {
-            const parentAddress = await userWalletService.getParentAddress();
+          console.log('Debug: Checking if current address is flow address');
+          let currentAddress: WalletAddress | null = null;
+
+          try {
+            currentAddress = await userWalletService.getCurrentAddress();
+            console.log('Debug: Got currentAddress:', currentAddress);
+          } catch (addressError) {
+            console.error('Debug: Error getting currentAddress:', addressError);
+          }
+
+          if (currentAddress && !isValidFlowAddress(currentAddress)) {
+            console.log(
+              'Debug: Current address is not a valid Flow address. Getting parent address.'
+            );
+            let parentAddress: WalletAddress | null = null;
+
+            try {
+              parentAddress = await userWalletService.getParentAddress();
+              console.log('Debug: Got parentAddress:', parentAddress);
+            } catch (parentAddressError) {
+              console.error('Debug: Error getting parentAddress:', parentAddressError);
+            }
+
             if (!parentAddress) {
               throw new Error('Parent address not found');
             }
-            await userWalletService.setCurrentAccount(
-              parentAddress,
-              parentAddress as WalletAddress
-            );
+
+            try {
+              console.log('Debug: Setting current account to parent address');
+              await userWalletService.setCurrentAccount(
+                parentAddress,
+                parentAddress as WalletAddress
+              );
+              console.log('Debug: Successfully set current account to parent address');
+            } catch (setAccountError) {
+              console.error('Debug: Error setting current account:', setAccountError);
+              throw new Error('Failed to set current account');
+            }
           }
         } catch (error) {
           console.error('Error validating or setting current address:', error);
@@ -559,8 +721,24 @@ const extMessageHandler = (msg, sender, sendResponse) => {
   if (msg.type === 'RIFT:GET_ADDRESS') {
     (async () => {
       try {
-        const address = await userWalletService.getCurrentAddress();
-        sendResponse({ address: address || null });
+        console.log('Debug: Received RIFT:GET_ADDRESS request');
+        console.log('Debug: Before getCurrentAddress - appStoreLoaded:', appStoreLoaded);
+        console.log('Debug: Is wallet locked:', !keyringService.isUnlocked());
+
+        let address: WalletAddress | null = null;
+        try {
+          address = await userWalletService.getCurrentAddress();
+          console.log('Debug: Successfully got address:', address);
+        } catch (addressError) {
+          console.error('Debug: Error getting address:', addressError);
+        }
+
+        console.log('Debug: Sending RIFT:GET_ADDRESS response with address:', address);
+        const response = {
+          address: address || null,
+        };
+        console.log('Debug: Sending response object:', response);
+        sendResponse(response);
       } catch (error) {
         console.error('Error getting address for Rift:', error);
         sendResponse({ error: 'Failed to get wallet address' });
@@ -572,8 +750,20 @@ const extMessageHandler = (msg, sender, sendResponse) => {
   if (msg.type === 'RIFT:GET_NETWORK') {
     (async () => {
       try {
-        const network = await userWalletService.getNetwork();
-        sendResponse({ network: network || 'mainnet' });
+        let network: string | null = null;
+        try {
+          network = await userWalletService.getNetwork();
+          console.log('Debug: Successfully got network:', network);
+        } catch (networkError) {
+          console.error('Debug: Error getting network:', networkError);
+        }
+
+        console.log('Debug: Sending RIFT:GET_NETWORK response with network:', network);
+        const response = {
+          network: network || 'mainnet',
+        };
+        console.log('Debug: Sending response object:', response);
+        sendResponse(response);
       } catch (error) {
         console.error('Error getting network for Rift:', error);
         sendResponse({ error: 'Failed to get wallet network' });

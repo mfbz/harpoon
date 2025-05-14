@@ -16,6 +16,55 @@ const processedRiftUrls = new Map<string, boolean>();
 // Track if a prompt is currently being shown to prevent multiple prompts
 let isPromptActive = false;
 
+// Generate a unique message ID
+function generateMessageId() {
+  return `rift_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
+
+// Store message callbacks for handling responses from background
+const messageCallbacks = new Map<string, (response: any) => void>();
+
+// Helper function to send messages to background and handle responses
+function sendMessageToBackground(message: any): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const messageId = generateMessageId();
+    const messageWithId = { ...message, messageId };
+
+    // Store callback for when response comes back
+    messageCallbacks.set(messageId, (response) => {
+      console.log(`Received response for message ${messageId}:`, response);
+      if (response && response.error) {
+        reject(new Error(response.error));
+      } else {
+        resolve(response);
+      }
+    });
+
+    // Send message to background
+    console.log(`Sending message to background with ID ${messageId}:`, messageWithId);
+    chrome.runtime.sendMessage(messageWithId, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error('Error sending message:', chrome.runtime.lastError);
+        messageCallbacks.delete(messageId);
+        reject(new Error(chrome.runtime.lastError.message));
+      }
+      // Note: response handling happens in the message listener below
+    });
+  });
+}
+
+// Set up global message listener for responses from background
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message && message.responseId && messageCallbacks.has(message.responseId)) {
+    const callback = messageCallbacks.get(message.responseId);
+    if (callback) {
+      callback(message.data);
+      messageCallbacks.delete(message.responseId);
+    }
+    return true;
+  }
+});
+
 // Check if Rift Frames are enabled in settings
 async function isRiftFramesEnabled(): Promise<boolean> {
   const riftEnabled = await storage.get('riftFramesEnabled');
@@ -231,19 +280,75 @@ async function handleHandshake(
   message: RiftHandshakeMessage
 ): Promise<void> {
   try {
-    // Request wallet information from background script
-    chrome.runtime.sendMessage({ type: 'RIFT:GET_CONTEXT' }, (response) => {
-      if (response && response.address) {
+    // Access message safely - log the entire message
+    console.log('Handling Rift handshake request:', message);
+
+    // Create a flag to track if we've already responded
+    let hasResponded = false;
+
+    // Setup a fallback timeout in case background script doesn't respond
+    const timeoutId = setTimeout(() => {
+      if (!hasResponded) {
+        console.warn('Handshake response timed out, sending fallback error');
+        hasResponded = true;
+
+        // Send error as fallback when background doesn't respond
+        const errorMessage: RiftErrorMessage = {
+          type: 'rift:error',
+          code: ERROR_CODES.WALLET_UNAVAILABLE,
+          message: 'Wallet connection timed out',
+        };
+
+        iframe.contentWindow?.postMessage(errorMessage, '*');
+      }
+    }, 5000); // 5 second timeout (increased from 3)
+
+    try {
+      // Request wallet information from background script using new helper
+      const response = await sendMessageToBackground({ type: 'RIFT:GET_CONTEXT' });
+
+      // Clear the timeout since we got a response
+      clearTimeout(timeoutId);
+
+      // Check if we've already responded from the timeout
+      if (hasResponded) {
+        console.log('Received late response from background, but already sent fallback');
+        return;
+      }
+
+      // Mark that we've responded
+      hasResponded = true;
+
+      console.log('Received response from background:', response);
+
+      // Enhanced validation to handle potentially malformed responses
+      const hasValidAddress =
+        response && typeof response.address === 'string' && response.address.length > 0;
+
+      const hasValidNetwork =
+        response && typeof response.network === 'string' && response.network.length > 0;
+
+      console.log('Response validation:', {
+        hasValidAddress,
+        hasValidNetwork,
+        addressType: response?.address ? typeof response.address : 'undefined',
+        networkType: response?.network ? typeof response.network : 'undefined',
+        responseType: typeof response,
+      });
+
+      if (hasValidAddress && hasValidNetwork) {
         // Send wallet context back to iframe
         const contextMessage: RiftContextMessage = {
           type: 'rift:context',
           address: response.address,
-          network: response.network || 'mainnet',
+          network: response.network,
         };
 
+        console.log('Sending context back to iframe:', contextMessage);
         iframe.contentWindow?.postMessage(contextMessage, '*');
       } else {
         // Send error if wallet info couldn't be retrieved
+        console.warn('Invalid response received from background', response);
         const errorMessage: RiftErrorMessage = {
           type: 'rift:error',
           code: ERROR_CODES.WALLET_UNAVAILABLE,
@@ -252,7 +357,24 @@ async function handleHandshake(
 
         iframe.contentWindow?.postMessage(errorMessage, '*');
       }
-    });
+    } catch (error) {
+      // Clear timeout if there was an error
+      clearTimeout(timeoutId);
+
+      if (hasResponded) return;
+      hasResponded = true;
+
+      console.error('Error getting context from background:', error);
+
+      // Send error to iframe
+      const errorMessage: RiftErrorMessage = {
+        type: 'rift:error',
+        code: ERROR_CODES.WALLET_UNAVAILABLE,
+        message: error.message || 'Error getting wallet context',
+      };
+
+      iframe.contentWindow?.postMessage(errorMessage, '*');
+    }
   } catch (error) {
     console.error('Error handling Rift handshake:', error);
 
@@ -272,18 +394,34 @@ async function handleIntent(iframe: HTMLIFrameElement, message: RiftIntentMessag
   try {
     switch (message.action) {
       case 'getUserAddress':
-        // Simply return the address from the wallet
-        chrome.runtime.sendMessage({ type: 'RIFT:GET_CONTEXT' }, (response) => {
-          if (response && response.address) {
-            iframe.contentWindow?.postMessage(
-              {
-                type: 'rift:context',
-                address: response.address,
-                network: response.network || 'mainnet',
-              },
-              '*'
-            );
+        try {
+          // Get address using the new helper function
+          const response = await sendMessageToBackground({ type: 'RIFT:GET_CONTEXT' });
+          console.log('getUserAddress response:', response);
+
+          // Enhanced validation for address response
+          const hasValidAddress =
+            response && typeof response.address === 'string' && response.address.length > 0;
+
+          const network = (response && response.network) || 'mainnet';
+
+          console.log('getUserAddress validation:', {
+            hasValidAddress,
+            addressType: response?.address ? typeof response.address : 'undefined',
+            networkType: response?.network ? typeof response.network : 'undefined',
+            responseType: typeof response,
+          });
+
+          if (hasValidAddress) {
+            const contextMessage = {
+              type: 'rift:context',
+              address: response.address,
+              network: network,
+            };
+            console.log('Sending address context to iframe:', contextMessage);
+            iframe.contentWindow?.postMessage(contextMessage, '*');
           } else {
+            console.warn('Invalid address response:', response);
             iframe.contentWindow?.postMessage(
               {
                 type: 'rift:error',
@@ -293,68 +431,96 @@ async function handleIntent(iframe: HTMLIFrameElement, message: RiftIntentMessag
               '*'
             );
           }
-        });
+        } catch (error) {
+          console.error('Error getting address for getUserAddress:', error);
+          iframe.contentWindow?.postMessage(
+            {
+              type: 'rift:error',
+              code: ERROR_CODES.WALLET_UNAVAILABLE,
+              message: error.message || 'Could not get wallet address',
+            },
+            '*'
+          );
+        }
         break;
 
       case 'query':
         // Execute a read-only script
-        chrome.runtime.sendMessage(
-          {
+        try {
+          const response = await sendMessageToBackground({
             type: 'RIFT:EXECUTE_SCRIPT',
             payload: message.payload,
-          },
-          (response) => {
-            if (response.error) {
-              iframe.contentWindow?.postMessage(
-                {
-                  type: 'rift:error',
-                  code: ERROR_CODES.UNKNOWN_ERROR,
-                  message: response.error,
-                },
-                '*'
-              );
-            } else {
-              iframe.contentWindow?.postMessage(
-                {
-                  type: 'rift:queryResult',
-                  result: response.result,
-                },
-                '*'
-              );
-            }
+          });
+
+          if (response && response.error) {
+            iframe.contentWindow?.postMessage(
+              {
+                type: 'rift:error',
+                code: ERROR_CODES.UNKNOWN_ERROR,
+                message: response.error,
+              },
+              '*'
+            );
+          } else {
+            iframe.contentWindow?.postMessage(
+              {
+                type: 'rift:queryResult',
+                result: response.result,
+              },
+              '*'
+            );
           }
-        );
+        } catch (error) {
+          console.error('Error executing Rift script:', error);
+          iframe.contentWindow?.postMessage(
+            {
+              type: 'rift:error',
+              code: ERROR_CODES.UNKNOWN_ERROR,
+              message: error.message || 'Script execution failed',
+            },
+            '*'
+          );
+        }
         break;
 
       case 'mutate':
         // Execute a transaction
-        chrome.runtime.sendMessage(
-          {
+        try {
+          const response = await sendMessageToBackground({
             type: 'RIFT:EXECUTE_TRANSACTION',
             payload: message.payload,
-          },
-          (response) => {
-            if (response.error) {
-              iframe.contentWindow?.postMessage(
-                {
-                  type: 'rift:error',
-                  code: response.code || ERROR_CODES.UNKNOWN_ERROR,
-                  message: response.error,
-                },
-                '*'
-              );
-            } else {
-              iframe.contentWindow?.postMessage(
-                {
-                  type: 'rift:mutateResult',
-                  status: 'success',
-                  txId: response.txId,
-                },
-                '*'
-              );
-            }
+          });
+
+          if (response && response.error) {
+            iframe.contentWindow?.postMessage(
+              {
+                type: 'rift:error',
+                code: response.code || ERROR_CODES.UNKNOWN_ERROR,
+                message: response.error,
+              },
+              '*'
+            );
+          } else {
+            iframe.contentWindow?.postMessage(
+              {
+                type: 'rift:mutateResult',
+                status: 'success',
+                txId: response.txId,
+              },
+              '*'
+            );
           }
-        );
+        } catch (error) {
+          console.error('Error executing Rift transaction:', error);
+          iframe.contentWindow?.postMessage(
+            {
+              type: 'rift:error',
+              code: ERROR_CODES.UNKNOWN_ERROR,
+              message: error.message || 'Transaction failed',
+            },
+            '*'
+          );
+        }
         break;
 
       default:
