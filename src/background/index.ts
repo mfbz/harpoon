@@ -1,4 +1,6 @@
 import 'reflect-metadata';
+import * as fcl from '@onflow/fcl';
+import * as t from '@onflow/types';
 import { ethErrors } from 'eth-rpc-errors';
 import { initializeApp } from 'firebase/app';
 import {
@@ -493,6 +495,8 @@ const extMessageHandler = (msg, sender, sendResponse) => {
   if (msg.type === 'RIFT:EXECUTE_SCRIPT') {
     // Execute script from Rift frame
     console.log('Background: Received RIFT:EXECUTE_SCRIPT request', msg);
+    console.log('Background: RIFT script message ID:', msg.messageId);
+    console.log('Background: RIFT script payload:', JSON.stringify(msg.payload, null, 2));
     const messageId = msg.messageId; // Extract the message ID
 
     (async () => {
@@ -555,14 +559,41 @@ const extMessageHandler = (msg, sender, sendResponse) => {
           return;
         }
 
-        // Execute the script
-        console.log('Executing script:', payload.cadence);
+        // Execute the script directly using FCL instead of using the provider flow
+        console.log('Background: Preparing to execute script with cadence:', payload.cadence);
+        console.log('Background: Script arguments:', payload.args || []);
+        console.log('Background: Executing script directly with FCL...');
+
         let result;
         try {
-          result = await walletController.sendRequest({
+          // Direct FCL query execution instead of going through provider/wallet controller
+          result = await fcl.query({
             cadence: payload.cadence,
-            args: payload.args || [],
+            args: (arg, t) => {
+              // If no args, return empty array
+              if (!payload.args || !Array.isArray(payload.args) || payload.args.length === 0) {
+                return [];
+              }
+
+              // Convert args to FCL format
+              return payload.args.map((argValue) => {
+                // Basic type inference - would need to be expanded for more complex types
+                if (typeof argValue === 'number') {
+                  return arg(argValue, t.Int);
+                } else if (typeof argValue === 'string') {
+                  return arg(argValue, t.String);
+                } else if (typeof argValue === 'boolean') {
+                  return arg(argValue, t.Bool);
+                } else {
+                  // Default to string for complex types
+                  return arg(String(argValue), t.String);
+                }
+              });
+            },
           });
+
+          console.log('Background: Script execution completed, raw result:', result);
+          console.log('Background: Result type:', typeof result);
 
           // Process the result to ensure we have a proper value
           if (result === undefined || result === null) {
@@ -586,11 +617,13 @@ const extMessageHandler = (msg, sender, sendResponse) => {
           }
         } catch (scriptError) {
           console.error('Error in script execution:', scriptError);
+          console.error('Script error details:', scriptError.stack || 'No stack trace available');
           throw new Error(`Script execution failed: ${scriptError.message || 'Unknown error'}`);
         }
 
         const responseData = { result };
         console.log('Debug: Script execution result:', responseData);
+        console.log('Debug: Response data to send back:', JSON.stringify(responseData, null, 2));
 
         // Prepare the response with the message ID if available
         if (messageId) {
@@ -600,6 +633,7 @@ const extMessageHandler = (msg, sender, sendResponse) => {
           };
 
           console.log('Debug: Response with ID:', responseWithId);
+          console.log('Debug: Sending response to tab...');
 
           // Send response to the active tab
           chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -609,17 +643,24 @@ const extMessageHandler = (msg, sender, sendResponse) => {
             } else if (sender?.tab?.id) {
               chrome.tabs.sendMessage(sender.tab.id, responseWithId);
               console.log(`Sent script result to sender tab ${sender.tab.id} with ID ${messageId}`);
+            } else {
+              console.error('Could not find any tab to send response to');
             }
           });
+        } else {
+          console.log('Debug: No messageId available, using sendResponse directly');
         }
 
         // Also send via the standard callback mechanism as a fallback
+        console.log('Debug: Sending response via sendResponse callback');
         sendResponse(responseData);
       } catch (error) {
         console.error('Error executing Rift script:', error);
+        console.error('Error stack:', error.stack || 'No stack trace available');
 
         const errorResponse = {
           error: error.message || 'Script execution failed',
+          code: 'unknown_error',
           status: 'error',
         };
 
@@ -631,16 +672,21 @@ const extMessageHandler = (msg, sender, sendResponse) => {
                 responseId: messageId,
                 data: errorResponse,
               });
+              console.log(`Sent error response to tab ${tabs[0].id}`);
             } else if (sender?.tab?.id) {
               chrome.tabs.sendMessage(sender.tab.id, {
                 responseId: messageId,
                 data: errorResponse,
               });
+              console.log(`Sent error response to sender tab ${sender.tab.id}`);
+            } else {
+              console.error('Could not find any tab to send error response to');
             }
           });
         }
 
         // Also send via the standard callback mechanism as a fallback
+        console.log('Debug: Sending error response via sendResponse callback');
         sendResponse(errorResponse);
       }
     })();

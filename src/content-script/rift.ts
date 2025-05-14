@@ -448,6 +448,7 @@ async function handleIntent(iframe: HTMLIFrameElement, message: RiftIntentMessag
         // Execute a read-only script
         try {
           console.log('Handling Rift script request:', message);
+          console.log('Script payload:', JSON.stringify(message.payload, null, 2));
 
           // Validate the payload is properly structured
           if (!message.payload || !message.payload.cadence) {
@@ -477,15 +478,22 @@ async function handleIntent(iframe: HTMLIFrameElement, message: RiftIntentMessag
             return;
           }
 
+          // Log the cadence script being sent to background
+          console.log('Cadence script to execute:', message.payload.cadence);
+          console.log('Script arguments:', message.payload.args || []);
+
           console.log('Sending script execution request to background');
           const response = await sendMessageToBackground({
             type: 'RIFT:EXECUTE_SCRIPT',
             payload: message.payload,
           });
 
-          console.log('Script execution response:', response);
+          console.log('Script execution response received:', response);
+          console.log('Response type:', typeof response);
+          console.log('Response structure:', JSON.stringify(response, null, 2));
 
           if (response && response.error) {
+            console.error('Script execution error:', response.error);
             iframe.contentWindow?.postMessage(
               {
                 type: 'rift:error',
@@ -497,6 +505,8 @@ async function handleIntent(iframe: HTMLIFrameElement, message: RiftIntentMessag
           } else {
             // Process the script result to ensure we return something valid
             let result = response?.result;
+            console.log('Raw script result:', result);
+            console.log('Result type:', typeof result);
 
             // Check if we got a null or undefined result but should have a value
             if (
@@ -511,9 +521,16 @@ async function handleIntent(iframe: HTMLIFrameElement, message: RiftIntentMessag
                 console.log('Extracted string return value from script:', stringMatch[1]);
                 result = stringMatch[1];
               }
+
+              // Also check for numeric returns
+              const numberMatch = message.payload.cadence.match(/return\s+(\d+\.?\d*)/);
+              if (!result && numberMatch && numberMatch[1]) {
+                console.log('Extracted numeric return value from script:', numberMatch[1]);
+                result = numberMatch[1];
+              }
             }
 
-            console.log('Sending script result to iframe:', result);
+            console.log('Final processed result to send:', result);
             iframe.contentWindow?.postMessage(
               {
                 type: 'rift:queryResult',
@@ -524,6 +541,7 @@ async function handleIntent(iframe: HTMLIFrameElement, message: RiftIntentMessag
           }
         } catch (error) {
           console.error('Error executing Rift script:', error);
+          console.error('Error details:', error.stack || 'No stack trace available');
           iframe.contentWindow?.postMessage(
             {
               type: 'rift:error',
