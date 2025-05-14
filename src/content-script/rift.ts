@@ -447,10 +447,43 @@ async function handleIntent(iframe: HTMLIFrameElement, message: RiftIntentMessag
       case 'query':
         // Execute a read-only script
         try {
+          console.log('Handling Rift script request:', message);
+
+          // Validate the payload is properly structured
+          if (!message.payload || !message.payload.cadence) {
+            console.error('Invalid script payload: Missing required cadence field');
+            iframe.contentWindow?.postMessage(
+              {
+                type: 'rift:error',
+                code: ERROR_CODES.INVALID_PAYLOAD,
+                message: 'Invalid script payload: Missing required cadence field',
+              },
+              '*'
+            );
+            return;
+          }
+
+          // Make sure cadence is a string
+          if (typeof message.payload.cadence !== 'string') {
+            console.error('Invalid script payload: cadence must be a string');
+            iframe.contentWindow?.postMessage(
+              {
+                type: 'rift:error',
+                code: ERROR_CODES.INVALID_PAYLOAD,
+                message: 'Invalid script payload: cadence must be a string',
+              },
+              '*'
+            );
+            return;
+          }
+
+          console.log('Sending script execution request to background');
           const response = await sendMessageToBackground({
             type: 'RIFT:EXECUTE_SCRIPT',
             payload: message.payload,
           });
+
+          console.log('Script execution response:', response);
 
           if (response && response.error) {
             iframe.contentWindow?.postMessage(
@@ -462,10 +495,29 @@ async function handleIntent(iframe: HTMLIFrameElement, message: RiftIntentMessag
               '*'
             );
           } else {
+            // Process the script result to ensure we return something valid
+            let result = response?.result;
+
+            // Check if we got a null or undefined result but should have a value
+            if (
+              (result === null || result === undefined) &&
+              message.payload.cadence.includes('return')
+            ) {
+              console.warn('Script returned null/undefined when a value was expected');
+
+              // For simple string returns, try to extract the value from the script
+              const stringMatch = message.payload.cadence.match(/return\s+["'](.+?)["']/);
+              if (stringMatch && stringMatch[1]) {
+                console.log('Extracted string return value from script:', stringMatch[1]);
+                result = stringMatch[1];
+              }
+            }
+
+            console.log('Sending script result to iframe:', result);
             iframe.contentWindow?.postMessage(
               {
                 type: 'rift:queryResult',
-                result: response.result,
+                result: result,
               },
               '*'
             );
@@ -486,6 +538,37 @@ async function handleIntent(iframe: HTMLIFrameElement, message: RiftIntentMessag
       case 'mutate':
         // Execute a transaction
         try {
+          console.log('Handling Rift transaction request:', message);
+
+          // Validate the payload is properly structured
+          if (!message.payload || !message.payload.cadence) {
+            console.error('Invalid transaction payload: Missing required cadence field');
+            iframe.contentWindow?.postMessage(
+              {
+                type: 'rift:error',
+                code: ERROR_CODES.INVALID_PAYLOAD,
+                message: 'Invalid transaction payload: Missing required cadence field',
+              },
+              '*'
+            );
+            return;
+          }
+
+          // Make sure cadence is a string
+          if (typeof message.payload.cadence !== 'string') {
+            console.error('Invalid transaction payload: cadence must be a string');
+            iframe.contentWindow?.postMessage(
+              {
+                type: 'rift:error',
+                code: ERROR_CODES.INVALID_PAYLOAD,
+                message: 'Invalid transaction payload: cadence must be a string',
+              },
+              '*'
+            );
+            return;
+          }
+
+          console.log('Sending transaction request to background');
           const response = await sendMessageToBackground({
             type: 'RIFT:EXECUTE_TRANSACTION',
             payload: message.payload,

@@ -500,11 +500,94 @@ const extMessageHandler = (msg, sender, sendResponse) => {
         // Extract script details from request
         const { payload } = msg;
 
+        if (!payload || !payload.cadence) {
+          console.error('Invalid script payload - missing cadence');
+          const errorResponse = {
+            error: 'Invalid script payload - missing cadence',
+            status: 'error',
+          };
+
+          if (messageId) {
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              if (tabs[0]?.id) {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                  responseId: messageId,
+                  data: errorResponse,
+                });
+              } else if (sender?.tab?.id) {
+                chrome.tabs.sendMessage(sender.tab.id, {
+                  responseId: messageId,
+                  data: errorResponse,
+                });
+              }
+            });
+          }
+
+          sendResponse(errorResponse);
+          return;
+        }
+
+        // Extra validation to ensure cadence is a string
+        if (typeof payload.cadence !== 'string') {
+          console.error('Invalid script payload - cadence must be a string');
+          const errorResponse = {
+            error: 'Invalid script payload - cadence must be a string',
+            status: 'error',
+          };
+
+          if (messageId) {
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              if (tabs[0]?.id) {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                  responseId: messageId,
+                  data: errorResponse,
+                });
+              } else if (sender?.tab?.id) {
+                chrome.tabs.sendMessage(sender.tab.id, {
+                  responseId: messageId,
+                  data: errorResponse,
+                });
+              }
+            });
+          }
+
+          sendResponse(errorResponse);
+          return;
+        }
+
         // Execute the script
-        const result = await walletController.sendRequest({
-          cadence: payload.cadence,
-          args: payload.args || [],
-        });
+        console.log('Executing script:', payload.cadence);
+        let result;
+        try {
+          result = await walletController.sendRequest({
+            cadence: payload.cadence,
+            args: payload.args || [],
+          });
+
+          // Process the result to ensure we have a proper value
+          if (result === undefined || result === null) {
+            console.warn('Script execution returned undefined or null');
+
+            // For simple scripts with string returns, try to extract the value
+            if (payload.cadence.includes('return') && payload.cadence.includes('main()')) {
+              const stringMatch = payload.cadence.match(/return\s+["'](.+?)["']/);
+              if (stringMatch && stringMatch[1]) {
+                console.log('Extracted string return value from script:', stringMatch[1]);
+                result = stringMatch[1];
+              }
+
+              // Also check for numeric returns
+              const numberMatch = payload.cadence.match(/return\s+(\d+\.?\d*)/);
+              if (!result && numberMatch && numberMatch[1]) {
+                console.log('Extracted numeric return value from script:', numberMatch[1]);
+                result = numberMatch[1];
+              }
+            }
+          }
+        } catch (scriptError) {
+          console.error('Error in script execution:', scriptError);
+          throw new Error(`Script execution failed: ${scriptError.message || 'Unknown error'}`);
+        }
 
         const responseData = { result };
         console.log('Debug: Script execution result:', responseData);
@@ -567,13 +650,46 @@ const extMessageHandler = (msg, sender, sendResponse) => {
 
   if (msg.type === 'RIFT:EXECUTE_TRANSACTION') {
     // Handle transaction from Rift frame
+    console.log('Background: Received RIFT:EXECUTE_TRANSACTION request', msg);
+    const messageId = msg.messageId; // Extract the message ID
+
+    // Handle transaction from Rift frame
     chrome.tabs
       .query({
         active: true,
         lastFocusedWindow: true,
       })
       .then(async (tabs) => {
-        const tabId = tabs[0].id;
+        const tabId = tabs[0]?.id;
+
+        // Handle potential validation errors early
+        if (!msg.payload || !msg.payload.cadence) {
+          console.error('Invalid transaction payload - missing cadence');
+          const errorResponse = {
+            error: 'Invalid transaction payload - missing cadence',
+            code: 'invalid_payload',
+            status: 'error',
+          };
+
+          // If we have a message ID, use the new response format for errors
+          if (messageId) {
+            if (tabId) {
+              chrome.tabs.sendMessage(tabId, {
+                responseId: messageId,
+                data: errorResponse,
+              });
+            } else if (sender?.tab?.id) {
+              chrome.tabs.sendMessage(sender.tab.id, {
+                responseId: messageId,
+                data: errorResponse,
+              });
+            }
+          }
+
+          // Also send via the standard callback mechanism as a fallback
+          sendResponse(errorResponse);
+          return;
+        }
 
         // Check if current address is flow address
         try {
