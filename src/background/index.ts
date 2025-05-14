@@ -559,39 +559,14 @@ const extMessageHandler = (msg, sender, sendResponse) => {
           return;
         }
 
-        // Execute the script directly using FCL instead of using the provider flow
+        // Execute the script using our dedicated function
         console.log('Background: Preparing to execute script with cadence:', payload.cadence);
         console.log('Background: Script arguments:', payload.args || []);
-        console.log('Background: Executing script directly with FCL...');
 
         let result;
         try {
-          // Direct FCL query execution instead of going through provider/wallet controller
-          result = await fcl.query({
-            cadence: payload.cadence,
-            args: (arg, t) => {
-              // If no args, return empty array
-              if (!payload.args || !Array.isArray(payload.args) || payload.args.length === 0) {
-                return [];
-              }
-
-              // Convert args to FCL format
-              return payload.args.map((argValue) => {
-                // Basic type inference - would need to be expanded for more complex types
-                if (typeof argValue === 'number') {
-                  return arg(argValue, t.Int);
-                } else if (typeof argValue === 'string') {
-                  return arg(argValue, t.String);
-                } else if (typeof argValue === 'boolean') {
-                  return arg(argValue, t.Bool);
-                } else {
-                  // Default to string for complex types
-                  return arg(String(argValue), t.String);
-                }
-              });
-            },
-          });
-
+          // Use our dedicated executeRiftScript function
+          result = await executeRiftScript(payload.cadence, payload.args || []);
           console.log('Background: Script execution completed, raw result:', result);
           console.log('Background: Result type:', typeof result);
 
@@ -1294,6 +1269,57 @@ async function sendRiftTransaction(cadence: string, args: any[] = []) {
     }
   } catch (error) {
     console.error('Error in Rift transaction execution:', error);
+    throw error;
+  }
+}
+
+// Function to directly execute a script using FCL methods
+// This is ONLY used for Rift scripts to ensure consistent FCL behavior
+// with proper argument handling
+async function executeRiftScript(cadence: string, args: any[] = []) {
+  console.log('Rift-specific FCL script execution');
+
+  try {
+    // Ensure current account is set to a valid Flow address (useful for scripts that use getCurrentFlow)
+    let currentAddress = await userWalletService.getCurrentAddress();
+    if (currentAddress && !isValidFlowAddress(currentAddress)) {
+      const parentAddress = await userWalletService.getParentAddress();
+      if (!parentAddress) {
+        throw new Error('Parent address not found');
+      }
+      await userWalletService.setCurrentAccount(parentAddress, parentAddress as WalletAddress);
+    }
+
+    // This follows FCL's standard query execution pattern
+    return await fcl.query({
+      cadence: cadence,
+      args: (arg, t) => {
+        // If no args, return empty array
+        if (!args || !Array.isArray(args) || args.length === 0) {
+          return [];
+        }
+
+        // Convert args to FCL format
+        return args.map((argValue) => {
+          // Type inference for common types
+          if (typeof argValue === 'number') {
+            return arg(argValue, t.Int);
+          } else if (typeof argValue === 'string') {
+            if (argValue.startsWith('0x')) {
+              return arg(argValue, t.Address);
+            }
+            return arg(argValue, t.String);
+          } else if (typeof argValue === 'boolean') {
+            return arg(argValue, t.Bool);
+          } else {
+            // Default to string for complex types
+            return arg(String(argValue), t.String);
+          }
+        });
+      },
+    });
+  } catch (error) {
+    console.error('Error in Rift script execution:', error);
     throw error;
   }
 }
