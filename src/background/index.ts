@@ -1226,86 +1226,74 @@ function convertRiftToFCL({ payload, tabId, origin, sender }) {
 }
 
 // Function to directly execute a transaction using FCL methods
-// This bypasses the current wallet flow that might add unnecessary authorizers
+// This is ONLY used for Rift transactions to avoid authorizer issues
+// DO NOT USE THIS FOR REGULAR WALLET TRANSACTIONS - it's a specialized handler
+// that only modifies the transaction flow for Rift frames to fix the
+// "authorizer count mismatch" error.
 async function sendRiftTransaction(cadence: string, args: any[] = []) {
-  console.log('Direct FCL transaction execution for Rift');
-  console.log('Transaction cadence:', cadence);
-  console.log('Transaction args:', args);
+  console.log('Rift-specific FCL transaction execution');
 
-  // Check if the transaction has a prepare block that expects authorizers
+  // Parse the transaction to check if it has a prepare block with AuthAccount parameters
+  // This is the standard way FCL determines if a transaction needs authorizers
   const needsAuthorizer =
     cadence.includes('prepare') && (cadence.includes('AuthAccount') || cadence.includes('auth'));
 
   console.log('Transaction needs authorizer:', needsAuthorizer);
 
-  // Convert args to FCL format
-  const fclArgs = () => {
-    if (!args || args.length === 0) {
-      return [];
-    }
-
-    return args.map((arg, i) => {
-      // Basic type inference for common types
-      if (typeof arg === 'number') {
-        return fcl.arg(arg, t.Int);
-      } else if (typeof arg === 'string') {
-        if (arg.startsWith('0x')) {
-          return fcl.arg(arg, t.Address);
-        }
-        return fcl.arg(arg, t.String);
-      } else if (typeof arg === 'boolean') {
-        return fcl.arg(arg, t.Bool);
-      } else {
-        console.log(`Complex arg type at index ${i}, using String:`, arg);
-        return fcl.arg(String(arg), t.String);
-      }
-    });
-  };
-
   try {
-    // Get the current address and make sure it's a Flow address
+    // Ensure current account is set to a valid Flow address
     let currentAddress = await userWalletService.getCurrentAddress();
     if (currentAddress && !isValidFlowAddress(currentAddress)) {
-      console.log('Current address is not a Flow address, getting parent address');
       const parentAddress = await userWalletService.getParentAddress();
       if (!parentAddress) {
         throw new Error('Parent address not found');
       }
       await userWalletService.setCurrentAccount(parentAddress, parentAddress as WalletAddress);
-      currentAddress = parentAddress;
     }
 
-    // Check if free gas fee is enabled
-    const allowFreeGas = await userWalletService.allowFreeGas();
-    const payerFunction = allowFreeGas
-      ? userWalletService.payerAuthFunction
-      : userWalletService.authorizationFunction;
+    // Convert args to FCL-compatible format
+    const fclArgs = () => {
+      if (!args || args.length === 0) {
+        return [];
+      }
 
-    // Configure transaction based on whether it needs authorizers
-    let txConfig = {
-      cadence: cadence,
-      args: fclArgs,
-      proposer: userWalletService.authorizationFunction,
-      payer: payerFunction,
-      limit: 9999,
+      return args.map((arg) => {
+        if (typeof arg === 'number') return fcl.arg(arg, t.Int);
+        if (typeof arg === 'string') {
+          if (arg.startsWith('0x')) return fcl.arg(arg, t.Address);
+          return fcl.arg(arg, t.String);
+        }
+        if (typeof arg === 'boolean') return fcl.arg(arg, t.Bool);
+        return fcl.arg(String(arg), t.String);
+      });
     };
 
-    // Only add authorizations if the transaction needs them
+    // Use FCL directly with proper configuration based on transaction needs
     if (needsAuthorizer) {
-      txConfig['authorizations'] = [userWalletService.authorizationFunction];
+      // For transactions that DO need authorizers, use standard FCL behavior
+      console.log('Using standard FCL transaction flow for authorizer transaction');
+      return await fcl.mutate({
+        cadence: cadence,
+        args: fclArgs,
+        proposer: userWalletService.authorizationFunction,
+        authorizations: [userWalletService.authorizationFunction],
+        payer: userWalletService.payerAuthFunction,
+        limit: 9999,
+      });
     } else {
-      console.log('Skipping authorizations for this transaction');
-      // Setting empty authorizations array
-      txConfig['authorizations'] = [];
+      // For transactions that DON'T need authorizers, use empty authorizations
+      console.log('Using FCL transaction flow with EMPTY authorizations');
+      return await fcl.mutate({
+        cadence: cadence,
+        args: fclArgs,
+        proposer: userWalletService.authorizationFunction,
+        authorizations: [], // Empty array - no authorizers
+        payer: userWalletService.payerAuthFunction,
+        limit: 9999,
+      });
     }
-
-    console.log('Sending transaction with config:', txConfig);
-    const txId = await fcl.mutate(txConfig);
-    console.log('Transaction sent successfully, txId:', txId);
-
-    return txId;
   } catch (error) {
-    console.error('Error in direct FCL transaction execution:', error);
+    console.error('Error in Rift transaction execution:', error);
     throw error;
   }
 }
