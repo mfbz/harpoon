@@ -77,21 +77,6 @@ async function isHttpDevelopmentModeEnabled(): Promise<boolean> {
   return httpDevMode === true;
 }
 
-// Check if user has already approved this domain
-async function isDomainApproved(domain: string): Promise<boolean> {
-  const approvedDomains = (await storage.get('riftApprovedDomains')) || [];
-  return approvedDomains.includes(domain);
-}
-
-// Save approved domain to storage
-async function approveDomain(domain: string): Promise<void> {
-  const approvedDomains = (await storage.get('riftApprovedDomains')) || [];
-  if (!approvedDomains.includes(domain)) {
-    approvedDomains.push(domain);
-    await storage.set('riftApprovedDomains', approvedDomains);
-  }
-}
-
 // Convert a rift:// URL to http:// or https:// based on development mode settings
 function convertRiftUrl(riftUrl: string, useHttp: boolean = false): string {
   const protocol = useHttp ? 'http://' : 'https://';
@@ -185,7 +170,7 @@ export async function initRiftDetection(): Promise<void> {
 
   // Create a detector from rift-js
   const detector = new wallet.detector.RiftDetector({
-    onRiftLinkFound: async (linkElement, riftUrl) => {
+    onRiftUriFound: async (node, riftUrl, range) => {
       try {
         // Skip if this URL has already been processed
         if (processedRiftUrls.has(riftUrl)) {
@@ -203,20 +188,17 @@ export async function initRiftDetection(): Promise<void> {
         const url = new URL(convertedUrl);
         const domain = url.hostname;
 
-        // Check if domain is already approved
-        const approved = await isDomainApproved(domain);
-        if (!approved) {
-          // Prompt user for approval
-          const userApproved = await promptForRiftInjection(domain);
-          if (!userApproved) {
-            // If not approved, remove from processed list to allow future prompts
-            processedRiftUrls.delete(riftUrl);
-            return;
-          }
-
-          // Save domain approval
-          await approveDomain(domain);
+        // Always prompt user for approval
+        const userApproved = await promptForRiftInjection(domain);
+        if (!userApproved) {
+          // If not approved, remove from processed list to allow future prompts
+          processedRiftUrls.delete(riftUrl);
+          return;
         }
+
+        // Create a container at the detected position
+        const container = document.createElement('div');
+        range.surroundContents(container);
 
         // Use the iframe injector from rift-js
         const injector = new wallet.injector.IframeInjector({
@@ -227,7 +209,7 @@ export async function initRiftDetection(): Promise<void> {
         });
 
         // Inject the iframe, injector will set correct url based on config
-        injector.injectFrame(linkElement, riftUrl);
+        injector.injectFrame(container, riftUrl);
       } catch (error) {
         // Clean up in case of error
         processedRiftUrls.delete(riftUrl);
