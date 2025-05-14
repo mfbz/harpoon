@@ -737,64 +737,24 @@ const extMessageHandler = (msg, sender, sendResponse) => {
           return;
         }
 
-        // Check if current address is flow address
-        try {
-          console.log('Debug: Checking if current address is flow address');
-          let currentAddress: WalletAddress | null = null;
-
-          try {
-            currentAddress = await userWalletService.getCurrentAddress();
-            console.log('Debug: Got currentAddress:', currentAddress);
-          } catch (addressError) {
-            console.error('Debug: Error getting currentAddress:', addressError);
-          }
-
-          if (currentAddress && !isValidFlowAddress(currentAddress)) {
-            console.log(
-              'Debug: Current address is not a valid Flow address. Getting parent address.'
-            );
-            let parentAddress: WalletAddress | null = null;
-
-            try {
-              parentAddress = await userWalletService.getParentAddress();
-              console.log('Debug: Got parentAddress:', parentAddress);
-            } catch (parentAddressError) {
-              console.error('Debug: Error getting parentAddress:', parentAddressError);
-            }
-
-            if (!parentAddress) {
-              throw new Error('Parent address not found');
-            }
-
-            try {
-              console.log('Debug: Setting current account to parent address');
-              await userWalletService.setCurrentAccount(
-                parentAddress,
-                parentAddress as WalletAddress
-              );
-              console.log('Debug: Successfully set current account to parent address');
-            } catch (setAccountError) {
-              console.error('Debug: Error setting current account:', setAccountError);
-              throw new Error('Failed to set current account');
-            }
-          }
-        } catch (error) {
-          console.error('Error validating or setting current address:', error);
-        }
-
         // Extract transaction details from request
         const { payload } = msg;
 
         // Get origin from sender for security
         const origin = new URL(sender.tab?.url || '').origin;
+        console.log('Debug: Transaction origin:', origin);
+        console.log('Debug: Transaction cadence:', payload.cadence);
+        console.log('Debug: Transaction args:', payload.args || []);
 
-        // Convert Rift transaction to FCL-compatible format
+        // Convert Rift transaction to FCL-compatible format for the popup
         const fclCompatibleData = convertRiftToFCL({
           payload,
           tabId,
           origin,
           sender,
         });
+
+        console.log('Debug: Opening approval popup with FCL-compatible data:', fclCompatibleData);
 
         // Open the approval popup
         notificationService
@@ -806,74 +766,217 @@ const extMessageHandler = (msg, sender, sendResponse) => {
             { height: 700 }
           )
           .then(async (response) => {
+            console.log('Debug: Approval response received:', JSON.stringify(response, null, 2));
+
             // Handle response from user
             if (response === 'rejected' || !response) {
               // User rejected the transaction
-              sendResponse({
+              console.log('Debug: Transaction rejected by user');
+              const rejectResponse = {
                 error: 'Transaction rejected by user',
                 code: 'user_rejected',
                 status: 'error',
-              });
+              };
+
+              // If we have a message ID, use the new response format for the rejection
+              if (messageId && tabId) {
+                chrome.tabs.sendMessage(tabId, {
+                  responseId: messageId,
+                  data: rejectResponse,
+                });
+              } else if (messageId && sender?.tab?.id) {
+                chrome.tabs.sendMessage(sender.tab.id, {
+                  responseId: messageId,
+                  data: rejectResponse,
+                });
+              }
+
+              sendResponse(rejectResponse);
               return;
             }
 
             try {
+              console.log('Debug: Processing approved transaction response type:', typeof response);
+              console.log('Debug: Response keys available:', Object.keys(response || {}));
+
               // If we have a txId from the response, use it
               if (response.txId) {
+                console.log('Debug: Using txId directly from response:', response.txId);
+
                 // Listen for transaction completion
                 walletController.listenTransaction(response.txId, true);
 
-                // Send response back to the content script
-                sendResponse({
+                // Prepare successful response
+                const successResponse = {
                   txId: response.txId,
                   status: 'success',
-                });
-              }
-              // If we have an approved response from the modified Confirmation component
-              else if (response.approved && response.transaction) {
-                // Store the refBlock ID if provided (for transaction tracking)
-                if (response.refBlock) {
-                  await sessionStorage.setItem('pendingRefBlockId', response.refBlock);
+                };
+
+                // If we have a message ID, use the new response format for the success
+                if (messageId && tabId) {
+                  chrome.tabs.sendMessage(tabId, {
+                    responseId: messageId,
+                    data: successResponse,
+                  });
+                } else if (messageId && sender?.tab?.id) {
+                  chrome.tabs.sendMessage(sender.tab.id, {
+                    responseId: messageId,
+                    data: successResponse,
+                  });
                 }
 
-                // Execute the transaction now that it's been approved by the user
-                const txId = await walletController.sendTransaction(
-                  response.transaction,
-                  response.args || []
+                // Send response back to the content script
+                sendResponse(successResponse);
+              }
+              // If we have an approved response from the modified Confirmation component
+              else if (
+                (response.approved && response.transaction) ||
+                (response.rift && response.approved)
+              ) {
+                console.log(
+                  'Debug: Using approved transaction from response, cadence:',
+                  response.transaction
+                    ? response.transaction.substring(0, 50) + '...'
+                    : 'using payload'
                 );
+                console.log('Debug: Args:', response.args || payload.args);
+                console.log('Debug: Is Rift transaction:', !!response.rift);
+
+                // Execute the transaction using our direct FCL method
+                console.log('Debug: Sending transaction via direct FCL method');
+                let txId;
+                try {
+                  // Use response.transaction if available, otherwise fall back to payload.cadence
+                  const transactionCode = response.transaction || payload.cadence;
+                  const transactionArgs = response.args || payload.args || [];
+
+                  console.log(
+                    'Debug: Final transaction code:',
+                    transactionCode.substring(0, 50) + '...'
+                  );
+                  console.log('Debug: Final transaction args:', transactionArgs);
+
+                  // Use the direct FCL transaction method instead of walletController
+                  txId = await sendRiftTransaction(transactionCode, transactionArgs);
+                  console.log('Debug: Transaction sent, txId:', txId);
+                } catch (txError) {
+                  console.error('Debug: Error sending transaction:', txError);
+                  throw txError;
+                }
 
                 // Listen for transaction completion
                 walletController.listenTransaction(txId, true);
 
-                // Send response back to the content script
-                sendResponse({
+                // Prepare successful response
+                const successResponse = {
                   txId,
                   status: 'success',
-                });
+                };
+
+                // If we have a message ID, use the new response format for the success
+                if (messageId && tabId) {
+                  chrome.tabs.sendMessage(tabId, {
+                    responseId: messageId,
+                    data: successResponse,
+                  });
+                } else if (messageId && sender?.tab?.id) {
+                  chrome.tabs.sendMessage(sender.tab.id, {
+                    responseId: messageId,
+                    data: successResponse,
+                  });
+                }
+
+                // Send response back to the content script
+                sendResponse(successResponse);
               } else {
-                // Execute the transaction if we don't have a txId
-                const txId = await walletController.sendTransaction(
-                  payload.cadence,
-                  payload.args || []
-                );
+                // Execute the transaction if we don't have specific info from the approval response
+                console.log('Debug: No transaction in approval response, using original payload');
+                console.log('Debug: Original cadence:', payload.cadence.substring(0, 50) + '...');
+                console.log('Debug: Original args:', payload.args);
+
+                let txId;
+                try {
+                  // Use direct FCL method instead of walletController
+                  txId = await sendRiftTransaction(payload.cadence, payload.args || []);
+                  console.log('Debug: Transaction sent, txId:', txId);
+                } catch (txError) {
+                  console.error('Debug: Error sending transaction with original payload:', txError);
+                  throw txError;
+                }
 
                 // Listen for transaction completion
                 walletController.listenTransaction(txId, true);
 
-                // Send response back to the content script
-                sendResponse({
+                // Prepare successful response
+                const successResponse = {
                   txId,
                   status: 'success',
-                });
+                };
+
+                // If we have a message ID, use the new response format for the success
+                if (messageId && tabId) {
+                  chrome.tabs.sendMessage(tabId, {
+                    responseId: messageId,
+                    data: successResponse,
+                  });
+                } else if (messageId && sender?.tab?.id) {
+                  chrome.tabs.sendMessage(sender.tab.id, {
+                    responseId: messageId,
+                    data: successResponse,
+                  });
+                }
+
+                // Send response back to the content script
+                sendResponse(successResponse);
               }
             } catch (error) {
               console.error('Error processing Rift transaction:', error);
-              sendResponse({
+              console.error('Error stack:', error.stack || 'No stack trace');
+              const errorResponse = {
                 error: error.message || 'Transaction failed',
                 code: 'unknown_error',
                 status: 'error',
+              };
+
+              // If we have a message ID, use the new response format for the error
+              if (messageId && tabId) {
+                chrome.tabs.sendMessage(tabId, {
+                  responseId: messageId,
+                  data: errorResponse,
+                });
+              } else if (messageId && sender?.tab?.id) {
+                chrome.tabs.sendMessage(sender.tab.id, {
+                  responseId: messageId,
+                  data: errorResponse,
+                });
+              }
+
+              sendResponse(errorResponse);
+            }
+          })
+          .catch((error) => {
+            // Handle errors from the notification service
+            console.error('Error in notification service:', error);
+            const errorResponse = {
+              error: error.message || 'Transaction approval failed',
+              code: 'approval_error',
+              status: 'error',
+            };
+
+            // If we have a message ID, use the new response format for the error
+            if (messageId && tabId) {
+              chrome.tabs.sendMessage(tabId, {
+                responseId: messageId,
+                data: errorResponse,
+              });
+            } else if (messageId && sender?.tab?.id) {
+              chrome.tabs.sendMessage(sender.tab.id, {
+                responseId: messageId,
+                data: errorResponse,
               });
             }
+
+            sendResponse(errorResponse);
           });
       });
 
@@ -992,6 +1095,53 @@ const extMessageHandler = (msg, sender, sendResponse) => {
         }
       });
   }
+
+  // Handle direct approval messages from the Confirmation popup
+  if (msg.type === 'RIFT:TRANSACTION_APPROVED') {
+    console.log('Background: Received direct RIFT:TRANSACTION_APPROVED message:', msg);
+
+    // Use the same pattern as our other async handlers
+    (async () => {
+      try {
+        const { payload } = msg;
+        const originalTabId = payload.originalTabId;
+        const originalMessageId = payload.originalMessageId;
+
+        console.log('Debug: Directly sending transaction via direct FCL method');
+        const txId = await sendRiftTransaction(payload.transaction, payload.args || []);
+        console.log('Debug: Direct transaction sent, txId:', txId);
+
+        // Listen for transaction completion
+        walletController.listenTransaction(txId, true);
+
+        // Prepare successful response
+        const successResponse = {
+          txId,
+          status: 'success',
+        };
+
+        // If we have the original message ID and tab ID, send the response
+        if (originalMessageId && originalTabId) {
+          chrome.tabs.sendMessage(originalTabId, {
+            responseId: originalMessageId,
+            data: successResponse,
+          });
+        }
+
+        sendResponse(successResponse);
+      } catch (error) {
+        console.error('Error processing direct Rift transaction approval:', error);
+        sendResponse({
+          error: error.message || 'Transaction failed',
+          code: 'unknown_error',
+          status: 'error',
+        });
+      }
+    })();
+
+    return true; // Keep channel open for async response
+  }
+
   sendResponse({ status: 'ok' });
   // return true
 };
@@ -1036,9 +1186,9 @@ function convertRiftToFCL({ payload, tabId, origin, sender }) {
     message: '', // Will be set by wallet during signing process
     addr: '', // Will be filled by wallet
     keyId: 0, // Will be filled by wallet
-    roles: {
+    roles: payload.roles || {
       proposer: true,
-      authorizer: true,
+      authorizer: false, // Default to false to avoid authorizer count mismatch errors
       payer: true,
     },
     voucher: {
@@ -1073,4 +1223,89 @@ function convertRiftToFCL({ payload, tabId, origin, sender }) {
     arguments: payload.args || [],
     cadence: payload.cadence,
   };
+}
+
+// Function to directly execute a transaction using FCL methods
+// This bypasses the current wallet flow that might add unnecessary authorizers
+async function sendRiftTransaction(cadence: string, args: any[] = []) {
+  console.log('Direct FCL transaction execution for Rift');
+  console.log('Transaction cadence:', cadence);
+  console.log('Transaction args:', args);
+
+  // Check if the transaction has a prepare block that expects authorizers
+  const needsAuthorizer =
+    cadence.includes('prepare') && (cadence.includes('AuthAccount') || cadence.includes('auth'));
+
+  console.log('Transaction needs authorizer:', needsAuthorizer);
+
+  // Convert args to FCL format
+  const fclArgs = () => {
+    if (!args || args.length === 0) {
+      return [];
+    }
+
+    return args.map((arg, i) => {
+      // Basic type inference for common types
+      if (typeof arg === 'number') {
+        return fcl.arg(arg, t.Int);
+      } else if (typeof arg === 'string') {
+        if (arg.startsWith('0x')) {
+          return fcl.arg(arg, t.Address);
+        }
+        return fcl.arg(arg, t.String);
+      } else if (typeof arg === 'boolean') {
+        return fcl.arg(arg, t.Bool);
+      } else {
+        console.log(`Complex arg type at index ${i}, using String:`, arg);
+        return fcl.arg(String(arg), t.String);
+      }
+    });
+  };
+
+  try {
+    // Get the current address and make sure it's a Flow address
+    let currentAddress = await userWalletService.getCurrentAddress();
+    if (currentAddress && !isValidFlowAddress(currentAddress)) {
+      console.log('Current address is not a Flow address, getting parent address');
+      const parentAddress = await userWalletService.getParentAddress();
+      if (!parentAddress) {
+        throw new Error('Parent address not found');
+      }
+      await userWalletService.setCurrentAccount(parentAddress, parentAddress as WalletAddress);
+      currentAddress = parentAddress;
+    }
+
+    // Check if free gas fee is enabled
+    const allowFreeGas = await userWalletService.allowFreeGas();
+    const payerFunction = allowFreeGas
+      ? userWalletService.payerAuthFunction
+      : userWalletService.authorizationFunction;
+
+    // Configure transaction based on whether it needs authorizers
+    let txConfig = {
+      cadence: cadence,
+      args: fclArgs,
+      proposer: userWalletService.authorizationFunction,
+      payer: payerFunction,
+      limit: 9999,
+    };
+
+    // Only add authorizations if the transaction needs them
+    if (needsAuthorizer) {
+      txConfig['authorizations'] = [userWalletService.authorizationFunction];
+    } else {
+      console.log('Skipping authorizations for this transaction');
+      // Setting empty authorizations array
+      txConfig['authorizations'] = [];
+    }
+
+    console.log('Sending transaction with config:', txConfig);
+    const txId = await fcl.mutate(txConfig);
+    console.log('Transaction sent successfully, txId:', txId);
+
+    return txId;
+  } catch (error) {
+    console.error('Error in direct FCL transaction execution:', error);
+    throw error;
+  }
 }

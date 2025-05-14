@@ -586,10 +586,31 @@ async function handleIntent(iframe: HTMLIFrameElement, message: RiftIntentMessag
             return;
           }
 
+          // Create a copy of the payload to avoid mutating the original
+          const txPayload = { ...message.payload };
+
+          // Check transaction content to determine if we should be an authorizer
+          const needsAuthorizer =
+            txPayload.cadence.includes('prepare(') ||
+            (txPayload.cadence.includes('transaction') &&
+              txPayload.cadence.includes('AuthAccount'));
+
+          // If transaction has no roles specified, set them based on the needs
+          if (!txPayload.roles) {
+            console.log('Setting transaction roles based on content analysis:', {
+              authorizer: needsAuthorizer,
+            });
+            txPayload.roles = {
+              proposer: true,
+              authorizer: needsAuthorizer,
+              payer: true,
+            };
+          }
+
           console.log('Sending transaction request to background');
           const response = await sendMessageToBackground({
             type: 'RIFT:EXECUTE_TRANSACTION',
-            payload: message.payload,
+            payload: txPayload,
           });
 
           if (response && response.error) {
