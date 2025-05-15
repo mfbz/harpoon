@@ -13,6 +13,13 @@ import storage from '../shared/utils/storage';
 // Track which Rift URLs have already been processed to avoid duplicate prompts
 const processedRiftUrls = new Map<string, boolean>();
 
+// Generate a unique ID for a Rift URI based on its position in the document
+function generateRiftUriId(node: Node, riftUrl: string): string {
+  // Create a unique identifier based on the URL and node position
+  const randomId = Math.random().toString(36).substr(2, 9);
+  return `${riftUrl}_${randomId}`;
+}
+
 // Generate a unique message ID
 function generateMessageId() {
   return `rift_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -111,13 +118,16 @@ export async function initRiftDetection(): Promise<void> {
   const detector = new wallet.detector.RiftDetector({
     onRiftUriFound: async (node, riftUrl, range) => {
       try {
-        // Skip if this URL has already been processed
-        if (processedRiftUrls.has(riftUrl)) {
+        // Generate a unique ID for this specific Rift URI instance
+        const riftUriId = generateRiftUriId(node, riftUrl);
+
+        // Skip if this specific instance has already been processed
+        if (processedRiftUrls.has(riftUriId)) {
           return;
         }
 
-        // Mark this URL as being processed
-        processedRiftUrls.set(riftUrl, true);
+        // Mark this URL instance as being processed
+        processedRiftUrls.set(riftUriId, true);
 
         // Convert the rift URL to HTTPS (or HTTP for localhost when dev mode is on)
         const convertedUrl = convertRiftUrl(riftUrl, httpDevMode);
@@ -260,7 +270,8 @@ export async function initRiftDetection(): Promise<void> {
         });
       } catch (error) {
         // Clean up in case of error
-        processedRiftUrls.delete(riftUrl);
+        const riftUriId = generateRiftUriId(node, riftUrl);
+        processedRiftUrls.delete(riftUriId);
         console.error('Error injecting Rift frame:', error);
       }
     },
