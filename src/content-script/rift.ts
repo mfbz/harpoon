@@ -133,7 +133,7 @@ export async function initRiftDetection(): Promise<void> {
         riftFrame.style.border = 'none';
         riftFrame.style.borderRadius = '24px';
         riftFrame.style.overflow = 'hidden';
-        riftFrame.style.backgroundColor = '#EEEEEE';
+        riftFrame.style.backgroundColor = '#F2F4F8';
         riftFrame.style.margin = '8px 0px';
         riftFrame.style.maxWidth = '100%';
 
@@ -143,8 +143,8 @@ export async function initRiftDetection(): Promise<void> {
         header.style.display = 'flex';
         header.style.alignItems = 'center';
         header.style.justifyContent = 'space-between';
-        header.style.padding = '8px 16px';
-        header.style.backgroundColor = '#EEEEEE';
+        header.style.padding = '12px 12px';
+        header.style.backgroundColor = '#F2F4F8';
 
         // Create left side of header with favicon and title
         const headerLeft = document.createElement('div');
@@ -152,33 +152,40 @@ export async function initRiftDetection(): Promise<void> {
         headerLeft.style.alignItems = 'center';
         headerLeft.style.gap = '8px';
 
-        // Add favicon
-        const favicon = document.createElement('img');
-        favicon.src = `https://www.google.com/s2/favicons?domain=${domain}`;
-        favicon.style.width = '16px';
-        favicon.style.height = '16px';
+        // Add rift emoji instead of favicon
+        const riftEmoji = document.createElement('span');
+        riftEmoji.textContent = '🌀';
+        riftEmoji.style.fontSize = '16px';
+        riftEmoji.style.marginLeft = '4px';
+        riftEmoji.style.lineHeight = '1';
+        riftEmoji.style.display = 'flex';
+        riftEmoji.style.alignItems = 'center';
+        riftEmoji.style.justifyContent = 'center';
 
         // Add title
         const title = document.createElement('span');
         title.textContent = domain;
-        title.style.fontSize = '12px';
+        title.style.fontSize = '14px';
         title.style.fontWeight = '500';
         title.style.color = '#000000';
 
-        headerLeft.appendChild(favicon);
+        headerLeft.appendChild(riftEmoji);
         headerLeft.appendChild(title);
 
         // Create inject button instead of a toggle
         const injectButton = document.createElement('button');
-        injectButton.textContent = 'Inject';
-        injectButton.style.background = '#00B4D8';
+        injectButton.textContent = '🪝 Inject';
+        injectButton.style.background = '#D7DFEA';
         injectButton.style.border = 'none';
         injectButton.style.borderRadius = '16px';
-        injectButton.style.padding = '2px 8px';
-        injectButton.style.fontSize = '11px';
+        injectButton.style.padding = '4px 12px';
+        injectButton.style.fontSize = '12px';
         injectButton.style.fontWeight = '500';
-        injectButton.style.color = '#FFFFFF';
+        injectButton.style.color = '#000000';
         injectButton.style.cursor = 'pointer';
+        injectButton.style.display = 'flex';
+        injectButton.style.alignItems = 'center';
+        injectButton.style.gap = '4px';
 
         // Add elements to header
         header.appendChild(headerLeft);
@@ -189,8 +196,6 @@ export async function initRiftDetection(): Promise<void> {
         contentContainer.className = 'rift-content';
         contentContainer.style.display = 'none';
         contentContainer.style.width = '100%';
-        contentContainer.style.height = '300px'; // Default height
-        contentContainer.style.backgroundColor = '#02033B'; // Match frame background
 
         // Add header and content to frame
         riftFrame.appendChild(header);
@@ -216,7 +221,7 @@ export async function initRiftDetection(): Promise<void> {
         injectButton.addEventListener('click', () => {
           if (!frameInjected) {
             // First click - inject the frame
-            injectButton.textContent = 'Remove';
+            injectButton.textContent = '❌ Remove';
 
             // Show content container
             contentContainer.style.display = 'block';
@@ -244,7 +249,7 @@ export async function initRiftDetection(): Promise<void> {
               contentContainer.style.display = 'none';
 
               // Reset button text and state
-              injectButton.textContent = 'Inject';
+              injectButton.textContent = '🪝 Inject';
               frameInjected = false;
 
               console.log('Rift frame removed successfully');
