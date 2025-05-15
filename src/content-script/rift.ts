@@ -13,6 +13,9 @@ import storage from '../shared/utils/storage';
 // Track which Rift URLs have already been processed to avoid duplicate prompts
 const processedRiftUrls = new Map<string, boolean>();
 
+// Keep a reference to the active detector instance
+let activeDetector: wallet.detector.RiftDetector | null = null;
+
 // Generate a unique ID for a Rift URI based on its position in the document
 function generateRiftUriId(node: Node, riftUrl: string): string {
   // Create a unique identifier based on the URL and node position
@@ -89,8 +92,487 @@ function convertRiftUrl(riftUrl: string, useHttp: boolean = false): string {
   return riftUrl.replace(RIFT_URI_SCHEME, protocol);
 }
 
+// Clean up the existing detector
+function cleanupDetector(): void {
+  if (activeDetector) {
+    console.log('Cleaning up existing Rift detector');
+    activeDetector.stop();
+    activeDetector = null;
+  }
+
+  // Clear processed URLs cache
+  processedRiftUrls.clear();
+}
+
+// Create and start a new detector instance
+async function createAndStartDetector(
+  httpDevMode: boolean
+): Promise<wallet.detector.RiftDetector | null> {
+  try {
+    // Create a detector from rift-js
+    const detector = new wallet.detector.RiftDetector({
+      onRiftUriFound: async (node, riftUrl, range) => {
+        try {
+          // Generate a unique ID for this specific Rift URI instance
+          const riftUriId = generateRiftUriId(node, riftUrl);
+
+          // Skip if this specific instance has already been processed
+          if (processedRiftUrls.has(riftUriId)) {
+            return;
+          }
+
+          // Mark this URL instance as being processed
+          processedRiftUrls.set(riftUriId, true);
+
+          // Convert the rift URL to HTTPS (or HTTP for localhost when dev mode is on)
+          const convertedUrl = convertRiftUrl(riftUrl, httpDevMode);
+          console.log('convertedUrl', convertedUrl);
+
+          // Parse domain from the URL
+          const url = new URL(convertedUrl);
+          const domain = url.hostname;
+
+          // Create a container at the detected position
+          const riftFrame = document.createElement('div');
+          riftFrame.className = 'rift-frame';
+          riftFrame.style.border = 'none';
+          riftFrame.style.borderRadius = '24px';
+          riftFrame.style.overflow = 'hidden';
+          riftFrame.style.backgroundColor = '#F2F4F8';
+          riftFrame.style.margin = '8px 0px';
+          riftFrame.style.maxWidth = '100%';
+
+          // Create header
+          const header = document.createElement('div');
+          header.className = 'rift-header';
+          header.style.display = 'flex';
+          header.style.alignItems = 'center';
+          header.style.justifyContent = 'space-between';
+          header.style.padding = '12px 12px';
+          header.style.backgroundColor = '#F2F4F8';
+
+          // Create left side of header with favicon and title
+          const headerLeft = document.createElement('div');
+          headerLeft.style.display = 'flex';
+          headerLeft.style.alignItems = 'center';
+          headerLeft.style.gap = '8px';
+
+          // Add rift emoji instead of favicon
+          const riftEmoji = document.createElement('span');
+          riftEmoji.textContent = '🌀';
+          riftEmoji.style.fontSize = '16px';
+          riftEmoji.style.marginLeft = '4px';
+          riftEmoji.style.lineHeight = '1';
+          riftEmoji.style.display = 'flex';
+          riftEmoji.style.alignItems = 'center';
+          riftEmoji.style.justifyContent = 'center';
+
+          // Add title
+          const title = document.createElement('span');
+          title.textContent = domain;
+          title.style.fontSize = '14px';
+          title.style.fontWeight = '500';
+          title.style.color = '#000000';
+
+          headerLeft.appendChild(riftEmoji);
+          headerLeft.appendChild(title);
+
+          // Create inject button instead of a toggle
+          const injectButton = document.createElement('button');
+          injectButton.textContent = '🪝 Inject';
+          injectButton.style.background = '#D7DFEA';
+          injectButton.style.border = 'none';
+          injectButton.style.borderRadius = '16px';
+          injectButton.style.padding = '4px 12px';
+          injectButton.style.fontSize = '12px';
+          injectButton.style.fontWeight = '500';
+          injectButton.style.color = '#000000';
+          injectButton.style.cursor = 'pointer';
+          injectButton.style.display = 'flex';
+          injectButton.style.alignItems = 'center';
+          injectButton.style.gap = '4px';
+
+          // Add elements to header
+          header.appendChild(headerLeft);
+          header.appendChild(injectButton);
+
+          // Create content container (initially hidden)
+          const contentContainer = document.createElement('div');
+          contentContainer.className = 'rift-content';
+          contentContainer.style.display = 'none';
+          contentContainer.style.width = '100%';
+
+          // Add header and content to frame
+          riftFrame.appendChild(header);
+          riftFrame.appendChild(contentContainer);
+
+          // Replace the original node with our rift frame
+          range.deleteContents();
+          range.insertNode(riftFrame);
+
+          // Use the iframe injector from rift-js
+          const injector = new wallet.injector.IframeInjector({
+            onIframeInjected: (iframeEl) => {
+              // Set up message handler for this iframe
+              setupFrameMessageHandling(iframeEl);
+            },
+          });
+
+          // Track if frame has been injected
+          let frameInjected = false;
+          let injectedIframe: HTMLIFrameElement | null = null;
+
+          // Handle button click to inject or remove the frame
+          injectButton.addEventListener('click', () => {
+            if (!frameInjected) {
+              // First click - inject the frame
+              injectButton.textContent = '❌ Remove';
+
+              // Show content container
+              contentContainer.style.display = 'block';
+
+              // Inject the iframe using the injector
+              try {
+                injectedIframe = injector.injectFrame(contentContainer, riftUrl);
+                frameInjected = true;
+                console.log('Rift frame injected successfully');
+              } catch (error) {
+                console.error('Error injecting Rift frame:', error);
+              }
+            } else {
+              // Second click - remove the frame
+              try {
+                // Use the injector's removeFrame method to properly clean up
+                // The removeFrame method expects the container element, not the iframe
+                injector.removeFrame(contentContainer);
+                injectedIframe = null;
+
+                // Clear the content container to ensure we can re-inject later
+                contentContainer.innerHTML = '';
+
+                // Hide content container
+                contentContainer.style.display = 'none';
+
+                // Reset button text and state
+                injectButton.textContent = '🪝 Inject';
+                frameInjected = false;
+
+                console.log('Rift frame removed successfully');
+              } catch (error) {
+                console.error('Error removing Rift frame:', error);
+              }
+            }
+          });
+        } catch (error) {
+          // Clean up in case of error
+          const riftUriId = generateRiftUriId(node, riftUrl);
+          processedRiftUrls.delete(riftUriId);
+          console.error('Error injecting Rift frame:', error);
+        }
+      },
+    });
+
+    // Start detection
+    detector.start();
+    return detector;
+  } catch (error) {
+    console.error('Error creating or starting Rift detector:', error);
+    return null;
+  }
+}
+
+// Set up listeners for various navigation events
+function setupNavigationListeners(): void {
+  // Listen for history state changes (pushState/replaceState)
+  const originalPushState = history.pushState;
+  const originalReplaceState = history.replaceState;
+
+  // Override pushState
+  history.pushState = function (...args) {
+    const result = originalPushState.apply(this, args);
+    console.log('History pushState detected, reprocessing Rift URIs');
+    reprocessRiftUris();
+    return result;
+  };
+
+  // Override replaceState
+  history.replaceState = function (...args) {
+    const result = originalReplaceState.apply(this, args);
+    console.log('History replaceState detected, reprocessing Rift URIs');
+    reprocessRiftUris();
+    return result;
+  };
+
+  // Listen for popstate events (back/forward navigation)
+  window.addEventListener('popstate', () => {
+    console.log('Popstate event detected, reprocessing Rift URIs');
+    reprocessRiftUris();
+  });
+
+  // Listen for hash changes
+  window.addEventListener('hashchange', () => {
+    console.log('Hash change detected, reprocessing Rift URIs');
+    reprocessRiftUris();
+  });
+
+  // Track URL path changes for SPA navigation
+  let lastPathname = window.location.pathname;
+  let lastSearch = window.location.search;
+
+  // Setup interval to check for URL path changes
+  const pathCheckInterval = setInterval(() => {
+    const currentPathname = window.location.pathname;
+    const currentSearch = window.location.search;
+
+    if (currentPathname !== lastPathname || currentSearch !== lastSearch) {
+      console.log(
+        'URL path/query change detected:',
+        `${lastPathname}${lastSearch} -> ${currentPathname}${currentSearch}`
+      );
+      lastPathname = currentPathname;
+      lastSearch = currentSearch;
+      reprocessRiftUris();
+    }
+  }, 500);
+
+  // Store the interval ID on window for cleanup if needed
+  (window as any).__riftPathCheckInterval = pathCheckInterval;
+
+  // Enhanced MutationObserver to detect general SPA navigation patterns
+  const bodyObserver = new MutationObserver((mutations) => {
+    // First, check for significant DOM changes that might indicate navigation
+    const significantChanges = mutations.some(
+      (mutation) => mutation.type === 'childList' && mutation.addedNodes.length > 5
+    );
+
+    if (significantChanges) {
+      console.log('Significant DOM changes detected, reprocessing Rift URIs');
+      reprocessRiftUris();
+      return;
+    }
+
+    // Look for common UI navigation patterns across various sites
+    const navigationPatterns = [
+      // Common modal/dialog indicators
+      '[role="dialog"]',
+      '[aria-modal="true"]',
+      '.modal',
+      '.dialog',
+
+      // Common navigation containers
+      'main',
+      'article',
+      'section[role="main"]',
+      '[role="main"]',
+
+      // Generic content containers
+      '#content',
+      '.content-container',
+      '#main-content',
+
+      // General navigation changes
+      'nav[aria-current]',
+      'a[aria-current="page"]',
+      '[data-route]',
+    ];
+
+    // Check if any mutations affected navigation-related elements
+    let navigationRelatedChanges = false;
+
+    for (const mutation of mutations) {
+      // Check for childList mutations (elements added or removed)
+      if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+        // Check added nodes for navigation-related elements
+        for (const node of Array.from(mutation.addedNodes)) {
+          if (node instanceof HTMLElement) {
+            // Check if this element matches any common navigation patterns
+            try {
+              for (const selector of navigationPatterns) {
+                if (node.matches(selector) || node.querySelector(selector) !== null) {
+                  navigationRelatedChanges = true;
+                  break;
+                }
+              }
+
+              if (navigationRelatedChanges) break;
+
+              // Also check for content containers or main content areas
+              if (
+                node.id === 'content' ||
+                node.id === 'main' ||
+                node.classList.contains('content') ||
+                node.getAttribute('role') === 'main'
+              ) {
+                navigationRelatedChanges = true;
+                break;
+              }
+            } catch (e) {
+              // Ignore selector matching errors
+            }
+          }
+        }
+      }
+
+      // Check for attribute changes that might indicate navigation
+      if (mutation.type === 'attributes') {
+        const target = mutation.target as HTMLElement;
+
+        // Check for changes to navigation-related attributes
+        if (
+          mutation.attributeName === 'aria-current' ||
+          mutation.attributeName === 'aria-selected' ||
+          mutation.attributeName === 'data-active' ||
+          mutation.attributeName === 'data-page'
+        ) {
+          navigationRelatedChanges = true;
+          break;
+        }
+
+        // Check for href changes on anchor elements
+        if (mutation.attributeName === 'href' && target instanceof HTMLAnchorElement) {
+          // Only consider this a navigation if the element has certain characteristics
+          // that suggest it's a main navigation element
+          if (
+            target.parentElement?.tagName === 'NAV' ||
+            target.getAttribute('role') === 'navigation' ||
+            target.classList.contains('nav-item') ||
+            target.getAttribute('aria-current') !== null
+          ) {
+            navigationRelatedChanges = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (navigationRelatedChanges) {
+      console.log('Navigation-related DOM changes detected, reprocessing Rift URIs');
+      reprocessRiftUris();
+    }
+  });
+
+  // Start observing the document body with enhanced configuration
+  bodyObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: [
+      'href',
+      'aria-current',
+      'aria-selected',
+      'aria-expanded',
+      'data-active',
+      'data-page',
+      'data-route',
+      'data-current',
+    ],
+  });
+
+  // Store reference to allow cleanup if needed
+  (window as any).__riftBodyObserver = bodyObserver;
+
+  // Additional technique: Listen for focus/visibility changes
+  // These can indicate tab switching or modal opening
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      console.log('Page became visible, reprocessing Rift URIs');
+      reprocessRiftUris();
+    }
+  });
+
+  // React to iframe focus events, which can indicate embedded content navigation
+  window.addEventListener('blur', () => {
+    // Check if an iframe was focused
+    if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
+      console.log('iframe focus detected, reprocessing Rift URIs');
+      reprocessRiftUris();
+    }
+  });
+
+  // Watch for scroll events that might indicate content loading
+  let lastScrollY = window.scrollY;
+  let scrollTimeout: number | null = null;
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      // If user scrolled significantly (more than 200px)
+      if (Math.abs(window.scrollY - lastScrollY) > 200) {
+        lastScrollY = window.scrollY;
+
+        // Debounce the scroll event
+        if (scrollTimeout) {
+          clearTimeout(scrollTimeout);
+        }
+
+        scrollTimeout = window.setTimeout(() => {
+          console.log('Significant scroll detected, reprocessing Rift URIs');
+          reprocessRiftUris();
+          scrollTimeout = null;
+        }, 500);
+      }
+    },
+    { passive: true }
+  );
+}
+
+// Function to reprocess Rift URIs after navigation
+async function reprocessRiftUris(): Promise<void> {
+  // Use a debounce mechanism to avoid multiple rapid reprocessing
+  if ((window as any).__riftReprocessingTimeout) {
+    clearTimeout((window as any).__riftReprocessingTimeout);
+  }
+
+  (window as any).__riftReprocessingTimeout = setTimeout(async () => {
+    // Check if Rift is still enabled
+    const enabled = await isRiftFramesEnabled();
+    if (!enabled) {
+      cleanupDetector();
+      return;
+    }
+
+    // Get development mode setting
+    const httpDevMode = await isHttpDevelopmentModeEnabled();
+
+    // Clean up existing detector and clear processed URLs
+    cleanupDetector();
+
+    // Create and start a new detector
+    activeDetector = await createAndStartDetector(httpDevMode);
+
+    console.log('Rift detector restarted after navigation');
+  }, 300); // Small delay to let the DOM update
+}
+
+// Clean up all resources when the content script is unloaded
+function cleanupAllResources(): void {
+  // Clean up the detector
+  cleanupDetector();
+
+  // Clear the path check interval if it exists
+  if ((window as any).__riftPathCheckInterval) {
+    clearInterval((window as any).__riftPathCheckInterval);
+    delete (window as any).__riftPathCheckInterval;
+  }
+
+  // Disconnect the body observer if it exists
+  if ((window as any).__riftBodyObserver) {
+    (window as any).__riftBodyObserver.disconnect();
+    delete (window as any).__riftBodyObserver;
+  }
+
+  // Clear any pending timeouts
+  if ((window as any).__riftReprocessingTimeout) {
+    clearTimeout((window as any).__riftReprocessingTimeout);
+    delete (window as any).__riftReprocessingTimeout;
+  }
+}
+
 // Main function to detect and inject Rift frames
 export async function initRiftDetection(): Promise<void> {
+  // Clean up any existing resources first (in case of re-initialization)
+  cleanupAllResources();
+
   // Only proceed if Rift frames are enabled
   const enabled = await isRiftFramesEnabled();
   if (!enabled) {
@@ -114,171 +596,14 @@ export async function initRiftDetection(): Promise<void> {
     });
   }
 
-  // Create a detector from rift-js
-  const detector = new wallet.detector.RiftDetector({
-    onRiftUriFound: async (node, riftUrl, range) => {
-      try {
-        // Generate a unique ID for this specific Rift URI instance
-        const riftUriId = generateRiftUriId(node, riftUrl);
+  // Create and start a new detector
+  activeDetector = await createAndStartDetector(httpDevMode);
 
-        // Skip if this specific instance has already been processed
-        if (processedRiftUrls.has(riftUriId)) {
-          return;
-        }
+  // Set up listeners for client-side navigation
+  setupNavigationListeners();
 
-        // Mark this URL instance as being processed
-        processedRiftUrls.set(riftUriId, true);
-
-        // Convert the rift URL to HTTPS (or HTTP for localhost when dev mode is on)
-        const convertedUrl = convertRiftUrl(riftUrl, httpDevMode);
-        console.log('convertedUrl', convertedUrl);
-
-        // Parse domain from the URL
-        const url = new URL(convertedUrl);
-        const domain = url.hostname;
-
-        // Create a container at the detected position
-        const riftFrame = document.createElement('div');
-        riftFrame.className = 'rift-frame';
-        riftFrame.style.border = 'none';
-        riftFrame.style.borderRadius = '24px';
-        riftFrame.style.overflow = 'hidden';
-        riftFrame.style.backgroundColor = '#F2F4F8';
-        riftFrame.style.margin = '8px 0px';
-        riftFrame.style.maxWidth = '100%';
-
-        // Create header
-        const header = document.createElement('div');
-        header.className = 'rift-header';
-        header.style.display = 'flex';
-        header.style.alignItems = 'center';
-        header.style.justifyContent = 'space-between';
-        header.style.padding = '12px 12px';
-        header.style.backgroundColor = '#F2F4F8';
-
-        // Create left side of header with favicon and title
-        const headerLeft = document.createElement('div');
-        headerLeft.style.display = 'flex';
-        headerLeft.style.alignItems = 'center';
-        headerLeft.style.gap = '8px';
-
-        // Add rift emoji instead of favicon
-        const riftEmoji = document.createElement('span');
-        riftEmoji.textContent = '🌀';
-        riftEmoji.style.fontSize = '16px';
-        riftEmoji.style.marginLeft = '4px';
-        riftEmoji.style.lineHeight = '1';
-        riftEmoji.style.display = 'flex';
-        riftEmoji.style.alignItems = 'center';
-        riftEmoji.style.justifyContent = 'center';
-
-        // Add title
-        const title = document.createElement('span');
-        title.textContent = domain;
-        title.style.fontSize = '14px';
-        title.style.fontWeight = '500';
-        title.style.color = '#000000';
-
-        headerLeft.appendChild(riftEmoji);
-        headerLeft.appendChild(title);
-
-        // Create inject button instead of a toggle
-        const injectButton = document.createElement('button');
-        injectButton.textContent = '🪝 Inject';
-        injectButton.style.background = '#D7DFEA';
-        injectButton.style.border = 'none';
-        injectButton.style.borderRadius = '16px';
-        injectButton.style.padding = '4px 12px';
-        injectButton.style.fontSize = '12px';
-        injectButton.style.fontWeight = '500';
-        injectButton.style.color = '#000000';
-        injectButton.style.cursor = 'pointer';
-        injectButton.style.display = 'flex';
-        injectButton.style.alignItems = 'center';
-        injectButton.style.gap = '4px';
-
-        // Add elements to header
-        header.appendChild(headerLeft);
-        header.appendChild(injectButton);
-
-        // Create content container (initially hidden)
-        const contentContainer = document.createElement('div');
-        contentContainer.className = 'rift-content';
-        contentContainer.style.display = 'none';
-        contentContainer.style.width = '100%';
-
-        // Add header and content to frame
-        riftFrame.appendChild(header);
-        riftFrame.appendChild(contentContainer);
-
-        // Replace the original node with our rift frame
-        range.deleteContents();
-        range.insertNode(riftFrame);
-
-        // Use the iframe injector from rift-js
-        const injector = new wallet.injector.IframeInjector({
-          onIframeInjected: (iframeEl) => {
-            // Set up message handler for this iframe
-            setupFrameMessageHandling(iframeEl);
-          },
-        });
-
-        // Track if frame has been injected
-        let frameInjected = false;
-        let injectedIframe: HTMLIFrameElement | null = null;
-
-        // Handle button click to inject or remove the frame
-        injectButton.addEventListener('click', () => {
-          if (!frameInjected) {
-            // First click - inject the frame
-            injectButton.textContent = '❌ Remove';
-
-            // Show content container
-            contentContainer.style.display = 'block';
-
-            // Inject the iframe using the injector
-            try {
-              injectedIframe = injector.injectFrame(contentContainer, riftUrl);
-              frameInjected = true;
-              console.log('Rift frame injected successfully');
-            } catch (error) {
-              console.error('Error injecting Rift frame:', error);
-            }
-          } else {
-            // Second click - remove the frame
-            try {
-              // Use the injector's removeFrame method to properly clean up
-              // The removeFrame method expects the container element, not the iframe
-              injector.removeFrame(contentContainer);
-              injectedIframe = null;
-
-              // Clear the content container to ensure we can re-inject later
-              contentContainer.innerHTML = '';
-
-              // Hide content container
-              contentContainer.style.display = 'none';
-
-              // Reset button text and state
-              injectButton.textContent = '🪝 Inject';
-              frameInjected = false;
-
-              console.log('Rift frame removed successfully');
-            } catch (error) {
-              console.error('Error removing Rift frame:', error);
-            }
-          }
-        });
-      } catch (error) {
-        // Clean up in case of error
-        const riftUriId = generateRiftUriId(node, riftUrl);
-        processedRiftUrls.delete(riftUriId);
-        console.error('Error injecting Rift frame:', error);
-      }
-    },
-  });
-
-  // Start detection
-  detector.start();
+  // Set up unload handler to clean up resources
+  window.addEventListener('unload', cleanupAllResources);
 }
 
 // Setup window.postMessage communication with the iframe
