@@ -13,9 +13,6 @@ import storage from '../shared/utils/storage';
 // Track which Rift URLs have already been processed to avoid duplicate prompts
 const processedRiftUrls = new Map<string, boolean>();
 
-// Track if a prompt is currently being shown to prevent multiple prompts
-let isPromptActive = false;
-
 // Generate a unique message ID
 function generateMessageId() {
   return `rift_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
