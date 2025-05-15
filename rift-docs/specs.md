@@ -2,19 +2,19 @@
 
 ## Overview
 
-**Rift Protocol** enables secure, embeddable, on-chain Web3 interactions using **iframe-based widgets** injected directly into webpages by a Rift-compatible wallet (like **Harpoon**).
+**Rift Protocol** enables secure, embeddable, on-chain Web3 interactions using **iframe-based components** injected directly into webpages by a Rift-compatible wallet (like **Harpoon**).
 
 At its core:
 
 - A **Rift** is a URI using the `rift://` scheme pointing to a hosted iframe UI.
-- **Harpoon Wallet** detects these URIs in webpages (both in links and plain text), prompts the user, and injects the iframe.
+- **Harpoon Wallet** detects these URIs in webpage text content, prompts the user, and injects the iframe.
 - A shared JavaScript SDK (**rift-js**) handles the communication between the injected iframe and the wallet.
 
 This system provides a seamless way to embed blockchain actions into any digital context, tweets, blogs, websites, or social bios, requiring no native dapp integration.
 
 ## How It Works
 
-1. A developer hosts a UI widget at a public HTTPS URL.
+1. A developer hosts a Rift Frame at a public HTTPS URL.
 2. The developer shares a `rift://` URI (like in a tweet or on their site or in any webpage).
 3. When a user with **Harpoon Wallet** visits a page containing that URI:
    - Harpoon detects it in text content
@@ -45,6 +45,25 @@ rift://mydapp.com/rift/quiz?ref=abc
 - **Only HTTPS iframe URLs are allowed:** `rift://` is resolved to `https://...`
 - The wallet injects an iframe pointing to `https://mydapp.com/rift/quiz?ref=abc`
 - URIs can be detected in text content
+
+### Customizing Rift Frames
+
+Rift URIs support special parameters with the `rift-` prefix to customize how frames are displayed:
+
+#### Frame Height
+
+The `rift-height` parameter controls the height of the injected frame:
+
+```
+rift://mydapp.com/rift/quiz?rift-height=tall&ref=abc
+```
+
+Available height presets:
+- `compact` (200px) - For simple confirmations or minimal UI
+- `standard` (350px) - Default size for most interactions (used if no height is specified)
+- `tall` (500px) - For complex interfaces like NFT minting
+
+**Note:** Parameters with the `rift-` prefix are processed by the wallet and not passed to the frame URL.
 
 ## URI Detection
 
@@ -103,11 +122,11 @@ rift.on('tx:success', (txId) => showSuccess(txId));
 rift.on('error', (err) => console.error(err));
 ```
 
-## Iframe-to-Wallet Messaging (Internal Spec)
+## Frame-to-Wallet Messaging (Internal Spec)
 
 Communication occurs over `window.postMessage`:
 
-### Iframe → Wallet
+### Frame → Wallet
 
 ```
 {
@@ -118,7 +137,7 @@ Communication occurs over `window.postMessage`:
 }
 ```
 
-### Wallet → Iframe
+### Wallet → Frame
 
 ```
 {
@@ -137,12 +156,9 @@ Communication occurs over `window.postMessage`:
 
 Harpoon, as the first Rift-compatible wallet, must:
 
-- Detect `rift://` URIs on any visited page (in links and plain text)
+- Detect `rift://` URIs on any visited page in text content
 - Parse and inject iframe URL (`rift://foo.com/path` → `https://foo.com/path`)
-- Prompt the user:
-
-  > "🪝 Harpoon detected a 🌀 Rift from foo.com, Inject it?"
-
+- Prompt the user
 - On approval:
   - Inject the iframe using a secured `sandbox` setup
   - Inject `window.rift` bridge to communicate with the iframe
@@ -150,11 +166,11 @@ Harpoon, as the first Rift-compatible wallet, must:
 
 ## Example Use Case
 
-1. Dev hosts widget at <https://quiz.mydapp.com>
-2. Dev shares `rift://quiz.mydapp.com` in a tweet as text
+1. Dev hosts Rift Frame at <https://quiz.mydapp.com>
+2. Dev shares `rift://quiz.mydapp.com?rift-height=tall` in a tweet as text
 3. User sees the URI in a tweet or on a site
-4. Harpoon sees the URI → injects the iframe (after approval)
-5. Iframe UI calls:
+4. Harpoon sees the URI → injects the iframe with height=500px (after approval)
+5. Frame UI calls:
 
 ```tsx
 const rift = await rift();
@@ -164,44 +180,13 @@ const result = await rift.submitTransaction({ ... });
 6. User signs tx via Harpoon popup
 7. Result passed back into the iframe via `rift:mutateResult`
 
-## Trusted Injection Domains
-
-Harpoon supports an allowlist system to:
-
-- Auto-inject from trusted domains
-- Cache prior approvals
-- Display warnings for unrecognized domains
-
-To become a trusted domain:
-
-- Host a `.well-known/rift.json` with domain info and optional wallet pubkey
-
-## Sample `.well-known/rift.json`
-
-```json
-{
-	"name": "QuizDApp",
-	"icon": "https://quiz.mydapp.com/icon.png",
-	"publicKey": "...",
-	"version": "1.0.0"
-}
-```
-
-## Testing Rifts
-
-To test locally:
-
-- Host your frame UI at `https://localhost:3000/iframe.html`
-- Share `rift://localhost:3000/iframe.html`
-- Open a page with that URI and have Harpoon injected
-
 ## Critical Considerations & Limitations
 
 Although Rift Protocol is highly buildable and modern browser-compatible, there are important technical and security considerations to be aware of when building or integrating with `rift://`-based workflows.
 
-### Iframe Sandboxing
+### Frame Sandboxing
 
-**Risk:** Iframes can be used to exfiltrate data, manipulate UX, or escape into parent context if not locked down.
+**Risk:** Frames can be used to exfiltrate data, manipulate UX, or escape into parent context if not locked down.
 
 **Solution:**
 
@@ -225,11 +210,11 @@ Although Rift Protocol is highly buildable and modern browser-compatible, there 
 
 ### CORS and Cross-Origin Access
 
-**Risk:** Iframes cannot directly call wallet APIs due to browser CORS policies.
+**Risk:** Frames cannot directly call wallet APIs due to browser CORS policies.
 
 **Solution:**
 
-- Iframes should **not call Harpoon APIs directly**
+- Frames should **not call Harpoon APIs directly**
 - Use `rift-js` which wraps postMessage-based RPC
 - Wallet should not expose HTTP endpoints, all comms go through message channel
 
@@ -241,7 +226,6 @@ Although Rift Protocol is highly buildable and modern browser-compatible, there 
 
 - Harpoon prompts the user before injecting any new origin
 - Users can "Always trust" or "Deny" domains
-- Wallet may check `/.well-known/rift.json` to validate Rift identity
 - Optionally implement a public Rift Provider Registry
 
 ### Mobile Limitations
@@ -279,8 +263,44 @@ Although Rift Protocol is highly buildable and modern browser-compatible, there 
 - Throttle scanning during rapid page updates
 - Only process text nodes that contain "rift://" substring
 
+## Error Handling
+
+When using the Rift protocol, developers should be prepared to handle various error scenarios:
+
+### Common Error Codes
+
+| Code                 | Description                    |
+| -------------------- | ------------------------------ |
+| `user_rejected`      | User denied the action         |
+| `wallet_unavailable` | Wallet extension not detected  |
+| `timeout`            | No response from wallet bridge |
+| `invalid_payload`    | Cadence or args were malformed |
+| `connection_error`   | Failed to connect to wallet    |
+| `not_initialized`    | SDK not properly initialized   |
+| `unknown_error`      | Unexpected error occurred      |
+| `not_supported`      | Feature not supported          |
+
+### Error Handling Example
+
+```ts
+rift.on('error', (err) => {
+  console.error(`Error (${err.code}): ${err.message}`);
+  
+  switch(err.code) {
+    case 'user_rejected':
+      // Handle user rejection
+      break;
+    case 'wallet_unavailable':
+      // Suggest wallet installation
+      break;
+    default:
+      // General error handling
+  }
+});
+```
+
 ## Summary
 
 - **Rift Protocol** turns any web page into a canvas for on-chain actions
-- **Harpoon Wallet** listens for `rift://` URIs (in links or text) and injects secure iframes
+- **Harpoon Wallet** listens for `rift://` URIs in text content and injects secure iframes
 - **rift-js** gives developers full access to wallet functions from inside the iframe

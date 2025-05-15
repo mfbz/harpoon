@@ -2,7 +2,7 @@
 
 `rift-js` is the official JavaScript/TypeScript SDK and documentation hub for the Rift Protocol, a lightweight, embeddable Web3 action framework.
 
-It enables iframe-based widgets (called **Rift Frames**) to securely communicate with Rift-compatible wallets (like **Harpoon 🪝**) to perform Flow blockchain interactions.
+It enables iframe-based components (called **Rift Frames**) to securely communicate with Rift-compatible wallets (like **Harpoon 🪝**) to perform Flow blockchain interactions.
 
 ## 🌐 What Is a Rift Frame?
 
@@ -25,7 +25,6 @@ rift-js/
 ├── src/                    # SDK source (TypeScript)
 ├── tests/                  # Library tests
 ├── dist/                   # Compiled output from Rollup
-├── examples/               # Example Rift Frame widgets
 ├── docs/                   # Protocol documentation
 ├── rollup.config.js        # Build config
 ├── tsconfig.json
@@ -41,22 +40,19 @@ npm install
 npm run build
 ```
 
-To use in a widget:
+To use in a frame:
 
 ```bash
 npm add rift-js
 ```
 
-## 🔧 How to Use `rift-js` in a Widget
+## 🔧 How to Use `rift-js` in a Frame
 
 ### 🔗 Connect & Submit a Transaction
 
 ```ts
-// Import from the root namespace (shortcut to widget.rift)
+// Import from the root namespace
 import { rift } from 'rift-js';
-
-// Or import from the widget namespace explicitly
-// import { rift } from 'rift-js/widget';
 
 const instance = await rift();
 console.log('Connected address:', await instance.getUserAddress());
@@ -88,12 +84,12 @@ rift.on('error', (err) => alert(err.message));
 
 ## 🔧 How to Use `rift-js` in a Wallet
 
-Wallet developers need to detect Rift URIs and handle communication with widgets:
+Wallet developers need to detect Rift URIs and handle communication with Rift Frames:
 
 ```ts
 import { wallet } from 'rift-js';
 
-// Create a detector to find Rift URIs in the page (both in links and plain text)
+// Create a detector to find Rift URIs in the page text content
 const detector = new wallet.RiftDetector({
 	onRiftUriFound: (node, riftUrl, range) => {
 		// Handle the URI (e.g., ask user for permission)
@@ -186,17 +182,17 @@ User approves
         ↓
 Harpoon injects a secure iframe
         ↓
-Rift widget loads and calls rift()
+Rift Frame loads and calls rift()
         ↓
 Handshake via postMessage
         ↓
 Harpoon responds with address and network context
         ↓
-Widget triggers tx or script intent
+Frame triggers tx or script intent
         ↓
 Harpoon signs, submits, or evaluates
         ↓
-Widget receives result or error event
+Frame receives result or error event
 ```
 
 ## 🧠 Error Handling
@@ -217,6 +213,10 @@ rift.on('error', (err) => {
 | `wallet_unavailable` | Wallet extension not detected  |
 | `timeout`            | No response from wallet bridge |
 | `invalid_payload`    | Cadence or args were malformed |
+| `connection_error`   | Failed to connect to wallet    |
+| `not_initialized`    | SDK not properly initialized   |
+| `unknown_error`      | Unexpected error occurred      |
+| `not_supported`      | Feature not supported          |
 
 ## 🌍 rift:// URI Format
 
@@ -231,6 +231,25 @@ Injected as:
 ```html
 <iframe src="https://domain.com/path?query=value" sandbox="..." />
 ```
+
+### Frame Customization
+
+You can customize how your Rift Frame appears using special parameters with the `rift-` prefix:
+
+#### Frame Height
+
+Control the height of your Rift Frame using the `rift-height` parameter:
+
+```
+rift://app.example.com/mint?rift-height=tall&tokenId=123
+```
+
+Available height presets:
+- `compact` (200px) - For simple confirmations or minimal UI
+- `standard` (350px) - Default size for most interactions  
+- `tall` (500px) - For complex interfaces like NFT minting
+
+The Frame itself will receive only the application parameters (like `tokenId=123`), while the wallet handles the Rift-specific parameters.
 
 ## 🔐 Protocol Implementation
 
@@ -442,36 +461,18 @@ Communication between the iframe and wallet happens through `postMessage`:
 }
 ```
 
-## 🛡 Trusted Domains and Metadata
-
-For auto-approval and branded UX, add `.well-known/rift.json`:
-
-```json
-{
-	"name": "My DApp",
-	"icon": "https://example.com/icon.png",
-	"version": "1.0.0",
-	"publicKey": "..."
-}
-```
-
-Used for:
-
-- Icon rendering
-- Trust and verification
-- Domain allowlisting
-
 ## 🧪 Local Testing
 
-1. Start the example widget:
+1. Start the example frame:
 
 ```bash
-cd widgets/hello-world
+cd starters/react-starter
 npm install
 npm run dev
+npm run open:test-rift
 ```
 
-2. Open a test page with inside:
+2. It will open the test-rift page linking to react-starter url:
 
 ```html
 rift://localhost:5173
@@ -502,14 +503,6 @@ We welcome contributions!
 2. Create a new branch
 3. Implement changes or additions
 4. Open a pull request with context
-
-### Dev Workflow
-
-```bash
-npm install
-npm run build
-npm run dev:widget
-```
 
 ## 📄 License
 
