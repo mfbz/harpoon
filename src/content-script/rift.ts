@@ -130,12 +130,11 @@ export async function initRiftDetection(): Promise<void> {
         // Create a container at the detected position
         const riftFrame = document.createElement('div');
         riftFrame.className = 'rift-frame';
-        riftFrame.style.border = '1px solid #e0e0e0';
-        riftFrame.style.borderRadius = '8px';
+        riftFrame.style.border = 'none';
+        riftFrame.style.borderRadius = '24px';
         riftFrame.style.overflow = 'hidden';
-        riftFrame.style.backgroundColor = '#ffffff';
-        riftFrame.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-        riftFrame.style.margin = '8px 0';
+        riftFrame.style.backgroundColor = '#EEEEEE';
+        riftFrame.style.margin = '8px 0px';
         riftFrame.style.maxWidth = '100%';
 
         // Create header
@@ -144,10 +143,8 @@ export async function initRiftDetection(): Promise<void> {
         header.style.display = 'flex';
         header.style.alignItems = 'center';
         header.style.justifyContent = 'space-between';
-        header.style.padding = '0 12px';
-        header.style.height = '24px';
-        header.style.backgroundColor = '#f5f5f5';
-        header.style.borderBottom = '1px solid #e0e0e0';
+        header.style.padding = '8px 16px';
+        header.style.backgroundColor = '#EEEEEE';
 
         // Create left side of header with favicon and title
         const headerLeft = document.createElement('div');
@@ -166,7 +163,7 @@ export async function initRiftDetection(): Promise<void> {
         title.textContent = domain;
         title.style.fontSize = '12px';
         title.style.fontWeight = '500';
-        title.style.color = '#333';
+        title.style.color = '#000000';
 
         headerLeft.appendChild(favicon);
         headerLeft.appendChild(title);
@@ -176,11 +173,11 @@ export async function initRiftDetection(): Promise<void> {
         injectButton.textContent = 'Inject';
         injectButton.style.background = '#00B4D8';
         injectButton.style.border = 'none';
-        injectButton.style.borderRadius = '4px';
+        injectButton.style.borderRadius = '16px';
         injectButton.style.padding = '2px 8px';
         injectButton.style.fontSize = '11px';
         injectButton.style.fontWeight = '500';
-        injectButton.style.color = 'white';
+        injectButton.style.color = '#FFFFFF';
         injectButton.style.cursor = 'pointer';
 
         // Add elements to header
@@ -193,6 +190,7 @@ export async function initRiftDetection(): Promise<void> {
         contentContainer.style.display = 'none';
         contentContainer.style.width = '100%';
         contentContainer.style.height = '300px'; // Default height
+        contentContainer.style.backgroundColor = '#02033B'; // Match frame background
 
         // Add header and content to frame
         riftFrame.appendChild(header);
