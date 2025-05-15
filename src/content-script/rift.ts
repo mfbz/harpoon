@@ -85,64 +85,6 @@ function convertRiftUrl(riftUrl: string, useHttp: boolean = false): string {
   return riftUrl.replace(RIFT_URI_SCHEME, protocol);
 }
 
-// Ask user for permission to inject Rift frame
-function promptForRiftInjection(domain: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    // Prevent multiple prompts from being shown simultaneously
-    if (isPromptActive) {
-      console.warn('A Rift injection prompt is already active');
-      resolve(false);
-      return;
-    }
-
-    isPromptActive = true;
-
-    // Create prompt UI
-    const promptDiv = document.createElement('div');
-    promptDiv.style.position = 'fixed';
-    promptDiv.style.bottom = '24px';
-    promptDiv.style.right = '24px';
-    promptDiv.style.backgroundColor = '#1E1E1E';
-    promptDiv.style.borderRadius = '12px';
-    promptDiv.style.padding = '16px';
-    promptDiv.style.zIndex = '9999';
-    promptDiv.style.color = 'white';
-    promptDiv.style.fontFamily = 'Inter, -apple-system, BlinkMacSystemFont, sans-serif';
-
-    promptDiv.innerHTML = `
-      <div style="margin-bottom: 12px; font-weight: 600;">
-        🪝 Harpoon detected a 🌀 Rift from ${domain}
-      </div>
-      <div style="display: flex; gap: 8px; justify-content: flex-end;">
-        <button id="rift-deny" style="background: none; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 8px 12px; color: white; cursor: pointer;">
-          Deny
-        </button>
-        <button id="rift-approve" style="background: #00B4D8; border: none; border-radius: 8px; padding: 8px 12px; color: white; font-weight: 500; cursor: pointer;">
-          Inject it
-        </button>
-      </div>
-    `;
-
-    document.body.appendChild(promptDiv);
-
-    // Function to clean up and resolve
-    const finishPrompt = (approved: boolean) => {
-      promptDiv.remove();
-      isPromptActive = false;
-      resolve(approved);
-    };
-
-    // Add event listeners
-    document.getElementById('rift-deny')?.addEventListener('click', () => {
-      finishPrompt(false);
-    });
-
-    document.getElementById('rift-approve')?.addEventListener('click', () => {
-      finishPrompt(true);
-    });
-  });
-}
-
 // Main function to detect and inject Rift frames
 export async function initRiftDetection(): Promise<void> {
   // Only proceed if Rift frames are enabled
@@ -188,28 +130,134 @@ export async function initRiftDetection(): Promise<void> {
         const url = new URL(convertedUrl);
         const domain = url.hostname;
 
-        // Always prompt user for approval
-        const userApproved = await promptForRiftInjection(domain);
-        if (!userApproved) {
-          // If not approved, remove from processed list to allow future prompts
-          processedRiftUrls.delete(riftUrl);
-          return;
-        }
-
         // Create a container at the detected position
-        const container = document.createElement('div');
-        range.surroundContents(container);
+        const riftFrame = document.createElement('div');
+        riftFrame.className = 'rift-frame';
+        riftFrame.style.border = '1px solid #e0e0e0';
+        riftFrame.style.borderRadius = '8px';
+        riftFrame.style.overflow = 'hidden';
+        riftFrame.style.backgroundColor = '#ffffff';
+        riftFrame.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+        riftFrame.style.margin = '8px 0';
+        riftFrame.style.maxWidth = '100%';
+
+        // Create header
+        const header = document.createElement('div');
+        header.className = 'rift-header';
+        header.style.display = 'flex';
+        header.style.alignItems = 'center';
+        header.style.justifyContent = 'space-between';
+        header.style.padding = '0 12px';
+        header.style.height = '24px';
+        header.style.backgroundColor = '#f5f5f5';
+        header.style.borderBottom = '1px solid #e0e0e0';
+
+        // Create left side of header with favicon and title
+        const headerLeft = document.createElement('div');
+        headerLeft.style.display = 'flex';
+        headerLeft.style.alignItems = 'center';
+        headerLeft.style.gap = '8px';
+
+        // Add favicon
+        const favicon = document.createElement('img');
+        favicon.src = `https://www.google.com/s2/favicons?domain=${domain}`;
+        favicon.style.width = '16px';
+        favicon.style.height = '16px';
+
+        // Add title
+        const title = document.createElement('span');
+        title.textContent = domain;
+        title.style.fontSize = '12px';
+        title.style.fontWeight = '500';
+        title.style.color = '#333';
+
+        headerLeft.appendChild(favicon);
+        headerLeft.appendChild(title);
+
+        // Create inject button instead of a toggle
+        const injectButton = document.createElement('button');
+        injectButton.textContent = 'Inject';
+        injectButton.style.background = '#00B4D8';
+        injectButton.style.border = 'none';
+        injectButton.style.borderRadius = '4px';
+        injectButton.style.padding = '2px 8px';
+        injectButton.style.fontSize = '11px';
+        injectButton.style.fontWeight = '500';
+        injectButton.style.color = 'white';
+        injectButton.style.cursor = 'pointer';
+
+        // Add elements to header
+        header.appendChild(headerLeft);
+        header.appendChild(injectButton);
+
+        // Create content container (initially hidden)
+        const contentContainer = document.createElement('div');
+        contentContainer.className = 'rift-content';
+        contentContainer.style.display = 'none';
+        contentContainer.style.width = '100%';
+        contentContainer.style.height = '300px'; // Default height
+
+        // Add header and content to frame
+        riftFrame.appendChild(header);
+        riftFrame.appendChild(contentContainer);
+
+        // Replace the original node with our rift frame
+        range.deleteContents();
+        range.insertNode(riftFrame);
 
         // Use the iframe injector from rift-js
         const injector = new wallet.injector.IframeInjector({
-          onIframeInjected: (iframe) => {
+          onIframeInjected: (iframeEl) => {
             // Set up message handler for this iframe
-            setupFrameMessageHandling(iframe);
+            setupFrameMessageHandling(iframeEl);
           },
         });
 
-        // Inject the iframe, injector will set correct url based on config
-        injector.injectFrame(container, riftUrl);
+        // Track if frame has been injected
+        let frameInjected = false;
+        let injectedIframe: HTMLIFrameElement | null = null;
+
+        // Handle button click to inject or remove the frame
+        injectButton.addEventListener('click', () => {
+          if (!frameInjected) {
+            // First click - inject the frame
+            injectButton.textContent = 'Remove';
+
+            // Show content container
+            contentContainer.style.display = 'block';
+
+            // Inject the iframe using the injector
+            try {
+              injectedIframe = injector.injectFrame(contentContainer, riftUrl);
+              frameInjected = true;
+              console.log('Rift frame injected successfully');
+            } catch (error) {
+              console.error('Error injecting Rift frame:', error);
+            }
+          } else {
+            // Second click - remove the frame
+            try {
+              // Use the injector's removeFrame method to properly clean up
+              // The removeFrame method expects the container element, not the iframe
+              injector.removeFrame(contentContainer);
+              injectedIframe = null;
+
+              // Clear the content container to ensure we can re-inject later
+              contentContainer.innerHTML = '';
+
+              // Hide content container
+              contentContainer.style.display = 'none';
+
+              // Reset button text and state
+              injectButton.textContent = 'Inject';
+              frameInjected = false;
+
+              console.log('Rift frame removed successfully');
+            } catch (error) {
+              console.error('Error removing Rift frame:', error);
+            }
+          }
+        });
       } catch (error) {
         // Clean up in case of error
         processedRiftUrls.delete(riftUrl);
