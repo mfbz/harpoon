@@ -91,7 +91,7 @@ const WalletConnect = (props: RevokePageProps) => {
           }),
           metadata: {
             name: 'Flow Walllet',
-            description: 'Digital wallet created for everyone.',
+            description: 'Embed digital experiences everywhere.',
             url: 'https://fcw-link.lilico.app',
             icons: ['https://fcw-link.lilico.app/logo.png'],
           },

@@ -269,7 +269,7 @@ const Sync = () => {
           }),
           metadata: {
             name: 'Harpoon Wallet',
-            description: 'Digital wallet created for everyone.',
+            description: 'Embed digital experiences everywhere.',
             url: extensionOrigin,
             icons: ['https://fcw-link.lilico.app/logo.png'],
             redirect: {

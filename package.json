@@ -1,7 +1,7 @@
 {
   "name": "harpoon",
-  "version": "2.8.3",
-  "description": "Digital wallet created for everyone.",
+  "version": "0.1.0",
+  "description": "Embed digital experiences everywhere.",
   "type": "module",
   "scripts": {
     "prepare:dev": "pnpx tsx ./build/prepareManifest.ts dev",
