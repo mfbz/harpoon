@@ -32,6 +32,7 @@ const Confirmation = ({ params }: ConnectProps) => {
     tabId,
     type,
     rift,
+    riftUrl,
     body,
     config,
     host: paramHost,
@@ -86,6 +87,10 @@ const Confirmation = ({ params }: ConnectProps) => {
     keyId: number;
     sig: string | null;
   }
+
+  // New states for Rift-specific UI
+  const [riftOrigin, setRiftOrigin] = useState<string | undefined>(undefined);
+  const [riftDisplayUrl, setRiftDisplayUrl] = useState<string | undefined>(undefined);
 
   const getUserInfo = useCallback(async () => {
     const userResult = await wallet.getUserInfo(false);
@@ -541,75 +546,146 @@ const Confirmation = ({ params }: ConnectProps) => {
     };
   }, []);
 
+  // Extract Rift information from params
+  useEffect(() => {
+    if (rift) {
+      console.log('Rift transaction detected with config:', config);
+      // Set the Rift display URL from riftUrl or config
+      const displayUrl = riftUrl || config?.rift?.url || '';
+      setRiftDisplayUrl(displayUrl);
+
+      // Set the Rift origin
+      const displayOrigin = config?.rift?.host || new URL(origin).hostname;
+      setRiftOrigin(displayOrigin);
+    }
+  }, [rift, config, riftUrl, origin]);
+
   return (
-    <>
-      {isLoading ? (
-        <Box>
-          {accountLinking ? (
-            <LLLinkingLoading
-              linkingDone={linkingDone}
-              image={image}
-              accountTitle={accountTitle}
-              userInfo={userInfo}
-            />
-          ) : (
-            <LLConnectLoading logo={logo} />
-          )}
-          {/* <LLConnectLoading logo={logo} /> */}
-        </Box>
-      ) : (
-        <Box
-          sx={{
-            margin: '18px 18px 0px 18px',
-            display: 'flex',
-            flexDirection: 'column',
-            borderRadius: '12px',
-            height: '100%',
-            background: '#03045E',
-          }}
-        >
-          {accountLinking ? (
-            <LinkingBlock image={image} accountTitle={accountTitle} userInfo={userInfo} />
-          ) : (
-            <DefaultBlock
-              title={title}
-              host={host}
-              auditor={auditor}
-              expanded={expanded}
-              lilicoEnabled={lilicoEnabled}
-              cadenceArguments={cadenceArguments}
-              logo={logo}
-              cadenceScript={cadenceScript}
-              setExpanded={setExpanded}
-              dedent={dedent}
-            />
-          )}
-          <Box sx={{ flexGrow: 1 }} />
-          <Stack direction="row" spacing={1} sx={{ paddingBottom: '32px' }}>
-            <LLSecondaryButton
-              label={chrome.i18n.getMessage('Cancel')}
-              fullWidth
-              onClick={handleCancel}
-            />
-            <LLPrimaryButton
-              label={chrome.i18n.getMessage('Approve')}
-              fullWidth
-              type="submit"
-              onClick={(e) => {
-                console.log('Approve button clicked');
-                console.log('Current state at click time:', {
-                  signable: signable ? 'present' : 'null',
-                  rift,
-                  cadence: cadence ? cadence.substring(0, 20) + '...' : 'null',
-                  args: args || [],
-                });
-                sendAuthzToFCL();
-              }}
-            />
-          </Stack>
+    <Stack
+      minHeight="592px"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: isLoading ? 'center' : 'flex-start',
+        padding: isLoading ? '0' : '32px 24px 24px',
+        height: '100%',
+      }}
+    >
+      {isLoading && !approval && !linkingDone && !accountLinking && (
+        <Box mb={4}>
+          <LLConnectLoading logo={logo} />
         </Box>
       )}
-    </>
+
+      {/* Add the Rift information display box */}
+      {rift && !isLoading && (
+        <Box
+          sx={{
+            backgroundColor: '#F2F4F8',
+            borderRadius: '16px',
+            padding: '12px 16px',
+            marginBottom: '16px',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            border: '1px solid #E5E8ED',
+          }}
+        >
+          <Box display="flex" alignItems="center" gap="8px">
+            <Box fontSize="16px">🌀</Box>
+            <Box fontWeight="600" color="#000">
+              Rift Transaction
+            </Box>
+          </Box>
+
+          {riftDisplayUrl && (
+            <Box
+              sx={{
+                fontSize: '14px',
+                fontFamily: 'monospace',
+                padding: '8px',
+                backgroundColor: '#E5E8ED',
+                borderRadius: '8px',
+                wordBreak: 'break-all',
+                lineHeight: '1.4',
+                color: '#000',
+              }}
+            >
+              {riftDisplayUrl}
+            </Box>
+          )}
+
+          {riftOrigin && (
+            <Box fontSize="12px" color="#666">
+              Origin: {riftOrigin}
+            </Box>
+          )}
+        </Box>
+      )}
+
+      {isLoading && !approval && !linkingDone && accountLinking && (
+        <Box mb={4}>
+          <LLLinkingLoading
+            linkingDone={linkingDone}
+            image={image}
+            accountTitle={accountTitle}
+            userInfo={userInfo}
+          />
+        </Box>
+      )}
+
+      {accountLinking ? (
+        <LinkingBlock image={image} accountTitle={accountTitle} userInfo={userInfo} />
+      ) : (
+        <DefaultBlock
+          title={title}
+          host={host}
+          auditor={auditor}
+          expanded={expanded}
+          lilicoEnabled={lilicoEnabled}
+          cadenceArguments={cadenceArguments}
+          logo={logo}
+          cadenceScript={cadenceScript}
+          setExpanded={setExpanded}
+          dedent={dedent}
+        />
+      )}
+
+      {/* Use flex-grow to push buttons to bottom */}
+      <Box sx={{ flexGrow: 1 }} />
+
+      {/* Button container fixed at bottom */}
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={{
+          marginTop: 'auto',
+          width: '100%',
+        }}
+      >
+        <LLSecondaryButton
+          label={chrome.i18n.getMessage('Cancel')}
+          fullWidth
+          onClick={handleCancel}
+        />
+        <LLPrimaryButton
+          label={chrome.i18n.getMessage('Approve')}
+          fullWidth
+          type="submit"
+          onClick={(e) => {
+            console.log('Approve button clicked');
+            console.log('Current state at click time:', {
+              signable: signable ? 'present' : 'null',
+              rift,
+              cadence: cadence ? cadence.substring(0, 20) + '...' : 'null',
+              args: args || [],
+            });
+            sendAuthzToFCL();
+          }}
+        />
+      </Stack>
+    </Stack>
   );
 };
 

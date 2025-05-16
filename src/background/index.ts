@@ -1155,6 +1155,9 @@ setInterval(saveTimestamp, SAVE_TIMESTAMP_INTERVAL_MS);
 
 // Function to convert Rift transaction data to FCL compatible format
 function convertRiftToFCL({ payload, tabId, origin, sender }) {
+  // Extract the Rift URL from the payload if it exists
+  const riftUrl = payload.riftUrl || '';
+
   // Create a synthetic FCL-compatible message body
   const body = {
     cadence: payload.cadence,
@@ -1180,8 +1183,16 @@ function convertRiftToFCL({ payload, tabId, origin, sender }) {
       network: payload.network || 'mainnet',
     },
     app: {
-      title: payload.title || 'Rift Transaction',
+      // Add Rift emoji to the title
+      title: `🌀 Rift from ${payload.title || new URL(origin).hostname}`,
+      // Either use the rift icon if available or fall back to the favicon
       icon: payload.icon || sender.tab?.favIconUrl || '',
+    },
+    // Add extra Rift-specific information
+    rift: {
+      url: riftUrl,
+      origin: origin,
+      host: new URL(origin).hostname,
     },
   };
 
@@ -1197,6 +1208,7 @@ function convertRiftToFCL({ payload, tabId, origin, sender }) {
     config, // FCL compatible config
     arguments: payload.args || [],
     cadence: payload.cadence,
+    riftUrl: riftUrl, // Add the Rift URL directly in the top-level properties
   };
 }
 

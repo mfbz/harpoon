@@ -973,6 +973,9 @@ async function handleIntent(iframe: HTMLIFrameElement, message: RiftIntentMessag
             };
           }
 
+          const riftUrlAttribute = iframe.getAttribute('src');
+          txPayload.riftUrl = riftUrlAttribute;
+
           console.log('Sending transaction request to background');
           const response = await sendMessageToBackground({
             type: 'RIFT:EXECUTE_TRANSACTION',
