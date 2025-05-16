@@ -89,7 +89,11 @@ function convertRiftUrl(riftUrl: string, useHttp: boolean = false): string {
   const protocol = useHttp ? 'http://' : 'https://';
 
   // Replace the rift:// scheme with the appropriate protocol
-  return riftUrl.replace(RIFT_URI_SCHEME, protocol);
+  // Make sure to keep the query parameters intact
+  console.log('Converting Rift URL:', riftUrl);
+  const converted = riftUrl.replace(RIFT_URI_SCHEME, protocol);
+  console.log('Converted URL:', converted);
+  return converted;
 }
 
 // Clean up the existing detector
@@ -102,6 +106,119 @@ function cleanupDetector(): void {
 
   // Clear processed URLs cache
   processedRiftUrls.clear();
+}
+
+// Parse query parameters from a Rift URL
+function getParamsFromRiftUrl(riftUrl: string): Record<string, string> {
+  try {
+    console.log('Raw Rift URL to parse:', riftUrl);
+    const params: Record<string, string> = {};
+
+    // Extract the query string from the rift URL
+    // This needs to handle formats like "rift://domain.com?param=value"
+    // or "rift://domain.com/path?param=value"
+    const queryMatch = riftUrl.match(/[?&]([^#]*)/);
+    console.log('Query match result:', queryMatch);
+
+    if (!queryMatch || !queryMatch[1]) return params;
+
+    const queryString = queryMatch[1];
+    console.log('Extracted query string:', queryString);
+
+    // Split and parse the parameters
+    queryString.split('&').forEach((pair) => {
+      const [key, value] = pair.split('=');
+      if (key && value) {
+        params[key] = decodeURIComponent(value);
+        console.log(`Found parameter: ${key} = ${params[key]}`);
+      }
+    });
+
+    return params;
+  } catch (error) {
+    console.error('Error parsing Rift URL parameters:', error);
+    return {};
+  }
+}
+
+// Determine if text should be white or black based on background color
+function getTextColorForBackground(backgroundColor: string): string {
+  try {
+    // Ensure we have a # prefix for hex colors
+    let hexColor = backgroundColor;
+    if (hexColor && !hexColor.startsWith('#') && hexColor.match(/^[0-9A-Fa-f]{3,8}$/)) {
+      hexColor = '#' + hexColor;
+    }
+
+    // Default to black if we can't parse the color
+    if (!hexColor || !hexColor.startsWith('#')) {
+      return '#000000';
+    }
+
+    // Convert hex to RGB
+    let r, g, b;
+    if (hexColor.length === 4) {
+      // For shorthand #rgb format
+      r = parseInt(hexColor[1] + hexColor[1], 16);
+      g = parseInt(hexColor[2] + hexColor[2], 16);
+      b = parseInt(hexColor[3] + hexColor[3], 16);
+    } else {
+      // For full #rrggbb format
+      r = parseInt(hexColor.substring(1, 3), 16);
+      g = parseInt(hexColor.substring(3, 5), 16);
+      b = parseInt(hexColor.substring(5, 7), 16);
+    }
+
+    // Calculate luminance (perceived brightness)
+    // Using the formula from WCAG 2.0
+    const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+
+    // Use white text for dark backgrounds, black for light
+    return luminance > 128 ? '#000000' : '#FFFFFF';
+  } catch (error) {
+    console.error('Error calculating text color:', error);
+    return '#000000'; // Default to black on error
+  }
+}
+
+// Generate a darker shade of a color for button background
+function getDarkerShade(color: string): string {
+  try {
+    // Ensure we have a # prefix for hex colors
+    let hexColor = color;
+    if (hexColor && !hexColor.startsWith('#') && hexColor.match(/^[0-9A-Fa-f]{3,8}$/)) {
+      hexColor = '#' + hexColor;
+    }
+
+    if (!hexColor || !hexColor.startsWith('#')) {
+      return '#D7DFEA'; // Default button color
+    }
+
+    // Convert hex to RGB
+    let r, g, b;
+    if (hexColor.length === 4) {
+      // For shorthand #rgb format
+      r = parseInt(hexColor[1] + hexColor[1], 16);
+      g = parseInt(hexColor[2] + hexColor[2], 16);
+      b = parseInt(hexColor[3] + hexColor[3], 16);
+    } else {
+      // For full #rrggbb format
+      r = parseInt(hexColor.substring(1, 3), 16);
+      g = parseInt(hexColor.substring(3, 5), 16);
+      b = parseInt(hexColor.substring(5, 7), 16);
+    }
+
+    // Darken by 15%
+    r = Math.max(0, r - 40);
+    g = Math.max(0, g - 40);
+    b = Math.max(0, b - 40);
+
+    // Convert back to hex
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  } catch (error) {
+    console.error('Error calculating darker shade:', error);
+    return '#D7DFEA'; // Default button color on error
+  }
 }
 
 // Create and start a new detector instance
@@ -132,13 +249,47 @@ async function createAndStartDetector(
           const url = new URL(convertedUrl);
           const domain = url.hostname;
 
+          // Get parameters from the Rift URL
+          const riftParams = getParamsFromRiftUrl(riftUrl);
+          console.log('riftParams', riftParams);
+
+          // Direct check for rift-color in the URL as a fallback
+          let riftColor = riftParams['rift-color'];
+          console.log('rift-color from params:', riftColor);
+
+          // If not found in the parsed params, try direct extraction
+          if (!riftColor) {
+            const colorMatch = riftUrl.match(/[?&]rift-color=([^&=#]*)/);
+            if (colorMatch && colorMatch[1]) {
+              riftColor = decodeURIComponent(colorMatch[1]);
+              console.log('rift-color extracted directly:', riftColor);
+            }
+          }
+
+          // Get custom background color from rift-color parameter, default to #F2F4F8
+          let backgroundColor = riftColor || '#F2F4F8';
+
+          // Make sure color has # prefix if it's a hex value
+          if (backgroundColor && backgroundColor.match(/^[0-9A-Fa-f]{3,8}$/)) {
+            backgroundColor = '#' + backgroundColor;
+            console.log('Added # prefix to color:', backgroundColor);
+          }
+
+          console.log('Final background color:', backgroundColor);
+
+          // Determine text color based on background brightness
+          const textColor = getTextColorForBackground(backgroundColor);
+
+          // Get darker shade of background color for button
+          const buttonColor = getDarkerShade(backgroundColor);
+
           // Create a container at the detected position
           const riftFrame = document.createElement('div');
           riftFrame.className = 'rift-frame';
           riftFrame.style.border = 'none';
           riftFrame.style.borderRadius = '24px';
           riftFrame.style.overflow = 'hidden';
-          riftFrame.style.backgroundColor = '#F2F4F8';
+          riftFrame.style.backgroundColor = backgroundColor;
           riftFrame.style.margin = '8px 0px';
           riftFrame.style.maxWidth = '100%';
 
@@ -149,44 +300,58 @@ async function createAndStartDetector(
           header.style.alignItems = 'center';
           header.style.justifyContent = 'space-between';
           header.style.padding = '12px 12px';
-          header.style.backgroundColor = '#F2F4F8';
+          header.style.backgroundColor = backgroundColor;
 
           // Create left side of header with favicon and title
           const headerLeft = document.createElement('div');
           headerLeft.style.display = 'flex';
           headerLeft.style.alignItems = 'center';
-          headerLeft.style.gap = '8px';
+          headerLeft.style.gap = '6px';
 
           // Add rift emoji instead of favicon
           const riftEmoji = document.createElement('span');
           riftEmoji.textContent = '🌀';
-          riftEmoji.style.fontSize = '16px';
-          riftEmoji.style.marginLeft = '4px';
+          riftEmoji.style.fontSize = '14px';
           riftEmoji.style.lineHeight = '1';
           riftEmoji.style.display = 'flex';
           riftEmoji.style.alignItems = 'center';
           riftEmoji.style.justifyContent = 'center';
+
+          // Create a circle background for the emoji using the button color
+          const emojiContainer = document.createElement('div');
+          emojiContainer.style.display = 'flex';
+          emojiContainer.style.alignItems = 'center';
+          emojiContainer.style.justifyContent = 'center';
+          emojiContainer.style.backgroundColor = buttonColor;
+          emojiContainer.style.borderRadius = '50%';
+          emojiContainer.style.width = '26px';
+          emojiContainer.style.height = '26px';
+          emojiContainer.style.padding = '0px';
+          emojiContainer.style.marginRight = '6px';
+
+          // Append emoji to its circular container
+          emojiContainer.appendChild(riftEmoji);
 
           // Add title
           const title = document.createElement('span');
           title.textContent = domain;
           title.style.fontSize = '14px';
           title.style.fontWeight = '500';
-          title.style.color = '#000000';
+          title.style.color = textColor;
 
-          headerLeft.appendChild(riftEmoji);
+          headerLeft.appendChild(emojiContainer);
           headerLeft.appendChild(title);
 
           // Create inject button instead of a toggle
           const injectButton = document.createElement('button');
           injectButton.textContent = '🪝 Inject';
-          injectButton.style.background = '#D7DFEA';
+          injectButton.style.background = buttonColor;
           injectButton.style.border = 'none';
           injectButton.style.borderRadius = '16px';
           injectButton.style.padding = '4px 12px';
           injectButton.style.fontSize = '12px';
           injectButton.style.fontWeight = '500';
-          injectButton.style.color = '#000000';
+          injectButton.style.color = textColor;
           injectButton.style.cursor = 'pointer';
           injectButton.style.display = 'flex';
           injectButton.style.alignItems = 'center';
