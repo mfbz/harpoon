@@ -2,7 +2,7 @@
 
 Harpoon is the first wallet built for Rift Protocol, an open, iframe-based protocol for embedding on-chain Flow interactions anywhere on the web.
 
-It is a **Chrome Extension** that detects `rift://` links in web pages and injects secure sandboxed widgets (Rift Frames). It enables Flow transactions, scripts, and real-time wallet interactions within any context — blogs, tweets, docs, and more.
+It is a **Chrome Extension** that detects `rift://` links in web pages and injects secure sandboxed Rift Frames. It enables Flow transactions, scripts, and real-time wallet interactions within any context like in blogs, tweets, docs, and more.
 
 ## 🧠 What Harpoon Does
 
@@ -22,12 +22,7 @@ It is a **Chrome Extension** that detects `rift://` links in web pages and injec
 
 ### Injection
 
-- The wallet injects a `<div id="rift-container">` and an `<iframe>` pointing to the Rift Frame URL
-- Sandboxed using:
-
-```html
-sandbox="allow-scripts allow-forms allow-popups allow-downloads"
-```
+- The wallet injects a `<div id="rift-frame">` and a sandboxed `<iframe>` pointing to the Rift Frame URL
 
 ### Communication
 
@@ -59,33 +54,13 @@ sandbox="allow-scripts allow-forms allow-popups allow-downloads"
 rift://nftdrop.mydapp.com/frame?ref=blog
 ```
 
-2. Harpoon detects the link and prompts:
-
-> 🪝 Harpoon detected a 🌀 Rift from nftdrop.mydapp.com. Inject this widget?
-
+2. Harpoon detects the link and prompts the user for injecting the frame
 3. User approves
-4. Widget is injected and loaded
-5. Widget calls `rift()` via `rift-js`
+4. Frame is injected and loaded
+5. Frame calls `rift()` via `rift-js`
 6. Wallet shares context, listens for intents
 7. User mints an NFT or signs a transaction
 8. Wallet submits tx and returns result
-
-## 🛡 Security Model
-
-- 🟢 Only one Rift Frame is injected at a time (per domain)
-- 🔒 Iframes are sandboxed and isolated
-- 🟡 Untrusted domains trigger approval prompts
-- ✅ Trusted domains can use `.well-known/rift.json` for auto-approval
-
-### `.well-known/rift.json`
-
-```json
-{
-  "name": "My Dapp",
-  "icon": "https://dapp.com/icon.png",
-  "version": "1.0.0"
-}
-```
 
 ## Contribution
 
